@@ -63,4 +63,23 @@ public class MatchController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    @GetMapping(path = "/matches")
+    public String matchStudent(@RequestBody Student student) throws JsonProcessingException {
+        System.out.println("GOT HERE");
+        List<Student> students = matchService.matchStudents(student);
+        System.out.println(students);
+        String returnStudent = "[";
+        if(students == null || students.size() <= 0){
+            return "No matches";
+        }
+
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        returnStudent  = ow.writeValueAsString(matchService.matchStudents(student));
+        for(int i = 1; i<students.size(); i++) {
+            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(student));
+        }
+        return returnStudent + "]";
+
+    }
 }

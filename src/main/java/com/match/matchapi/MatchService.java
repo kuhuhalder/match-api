@@ -7,12 +7,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class MatchService {
-    //skjdsdf
 
     @Autowired
     private final MatchRepository matchRepository;
@@ -65,5 +65,17 @@ public class MatchService {
 
     public Student getStudent(String userName) {
         return mongoTemplate.findById(userName, Student.class);
+    }
+
+//    public Student updateStudent(Student student) {
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("userName").is(student.getUserName()));
+//        List<Student> students = mongoTemplate.find(query, Student.class);
+//    }
+    public List<Student> matchStudents (Student student) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("course").is(student.getCourse()));
+        List<Student> students = mongoTemplate.find(query, Student.class);
+        return students;
     }
 }

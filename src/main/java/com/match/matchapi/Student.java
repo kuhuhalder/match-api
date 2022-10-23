@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 
 @Data
 @Document
@@ -25,7 +24,8 @@ public class Student {
     private String genderPreference;
     private String bio;
 
-    private ArrayList<String> courses;
+   // private ArrayList<String> courses;
+    private String course;
 
     private int isAdmin;
 
