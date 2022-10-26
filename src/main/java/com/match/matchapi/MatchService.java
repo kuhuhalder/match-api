@@ -76,6 +76,11 @@ public class MatchService {
         Query query = new Query();
         query.addCriteria(Criteria.where("course").is(student.getCourse()));
         List<Student> students = mongoTemplate.find(query, Student.class);
+        for(int i=0;i<students.size();i++) {
+            if(students.get(i).getUserName().equals(student.getUserName())) {
+                students.remove(i);
+            }
+        }
         return students;
     }
 }

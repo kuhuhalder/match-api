@@ -21,13 +21,13 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    @GetMapping
+    @GetMapping(path = "/getAll")
     public List<Student> fetchAllStudents() {
         return matchService.getAllStudents();
     }
 
     @Transactional
-    @PostMapping
+    @PostMapping(path = "/add")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity addStudent(@RequestBody Student student){
         if(matchService.addStudent(student)) {
@@ -38,7 +38,7 @@ public class MatchController {
         }
     }
 
-    @GetMapping(path = "/{userName}/{password}")
+    @GetMapping(path = "/validate/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity validation(@PathVariable String userName, @PathVariable String password){
         if (matchService.validation(userName, password)){
@@ -47,15 +47,16 @@ public class MatchController {
         return ResponseEntity.ok(false);
     }
 
-    @GetMapping(path = "/{userName}")
+    @GetMapping(path = "/getStudent/{userName}")
     @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
     public String getStudent(@PathVariable String userName) throws JsonProcessingException {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         return ow.writeValueAsString(matchService.getStudent(userName));
     }
 
     @Transactional
-    @DeleteMapping(path = "/{userName}/{password}")
+    @DeleteMapping(path = "/delete/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public  ResponseEntity deleteStudent(@PathVariable String userName, @PathVariable String password){
         if (matchService.deleteStudent(userName, password)){
@@ -65,6 +66,8 @@ public class MatchController {
     }
 
     @GetMapping(path = "/matches")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
     public String matchStudent(@RequestBody Student student) throws JsonProcessingException {
         System.out.println("GOT HERE");
         List<Student> students = matchService.matchStudents(student);
@@ -78,8 +81,12 @@ public class MatchController {
         returnStudent  = ow.writeValueAsString(matchService.matchStudents(student));
         for(int i = 1; i<students.size(); i++) {
             returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(student));
+            //System.out.println(returnStudent);
         }
-        return returnStudent + "]";
+        System.out.println(returnStudent);
+        returnStudent = returnStudent + "]";
+
+        return returnStudent;
 
     }
 }
