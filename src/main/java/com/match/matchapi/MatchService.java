@@ -51,16 +51,17 @@ public class MatchService {
         return true;
     }
 
-    public boolean deleteStudent(String userName, String password) {
+    public boolean deleteStudent(String userName) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(userName));
         List<Student> students = mongoTemplate.find(query, Student.class);
+        if(students == null) {
+            return false;
+        }
 
-        if(validation(userName, password)){
             matchRepository.deleteById(students.get(0).getId());
             return true;
-        }
-        return false;
+
     }
 
     public Student getStudent(String userName) {

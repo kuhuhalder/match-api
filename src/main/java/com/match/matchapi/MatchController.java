@@ -52,15 +52,14 @@ public class MatchController {
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
     public Student getStudent(@PathVariable String userName) throws JsonProcessingException {
-        //ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         return matchService.getStudent(userName);
     }
 
     @Transactional
-    @DeleteMapping(path = "/delete/{userName}/{password}")
+    @DeleteMapping(path = "/delete/{userName}")
     @CrossOrigin(origins="http://localhost:3000")
-    public  ResponseEntity deleteStudent(@PathVariable String userName, @PathVariable String password){
-        if (matchService.deleteStudent(userName, password)){
+    public  ResponseEntity deleteStudent(@PathVariable String userName){
+        if (matchService.deleteStudent(userName)){
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -82,7 +81,6 @@ public class MatchController {
         returnStudent  = ow.writeValueAsString(matchService.matchStudents(student));
         for(int i = 1; i<students.size(); i++) {
             returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(student));
-            //System.out.println(returnStudent);
         }
         System.out.println(returnStudent);
         returnStudent = returnStudent + "]";
