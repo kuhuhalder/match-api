@@ -21,13 +21,14 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    @GetMapping
+    @GetMapping(path = "/getAll")
+    @ResponseBody
     public List<Student> fetchAllStudents() {
         return matchService.getAllStudents();
     }
 
     @Transactional
-    @PostMapping
+    @PostMapping(path = "/add")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity addStudent(@RequestBody Student student){
         if(matchService.addStudent(student)) {
@@ -38,7 +39,7 @@ public class MatchController {
         }
     }
 
-    @GetMapping(path = "/{userName}/{password}")
+    @GetMapping(path = "/validate/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity validation(@PathVariable String userName, @PathVariable String password){
         if (matchService.validation(userName, password)){
@@ -47,18 +48,53 @@ public class MatchController {
         return ResponseEntity.ok(false);
     }
 
-    @GetMapping(path = "/{userName}")
+    @GetMapping(path = "/getStudent/{userName}")
     @ResponseBody
-    public String getStudent(@PathVariable String userName) throws JsonProcessingException {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        return ow.writeValueAsString(matchService.getStudent(userName));
+    @CrossOrigin(origins="http://localhost:3000")
+    public Student getStudent(@PathVariable String userName) throws JsonProcessingException {
+        //ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        return matchService.getStudent(userName);
     }
 
     @Transactional
-    @DeleteMapping(path = "/{userName}/{password}")
+    @DeleteMapping(path = "/delete/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public  ResponseEntity deleteStudent(@PathVariable String userName, @PathVariable String password){
         if (matchService.deleteStudent(userName, password)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping(path = "/matches")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
+    public String matchStudent(@RequestBody Student student) throws JsonProcessingException {
+        System.out.println("GOT HERE");
+        List<Student> students = matchService.matchStudents(student);
+        System.out.println(students);
+        String returnStudent = "[";
+        if(students == null || students.size() <= 0){
+            return "No matches";
+        }
+
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        returnStudent  = ow.writeValueAsString(matchService.matchStudents(student));
+        for(int i = 1; i<students.size(); i++) {
+            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(student));
+            //System.out.println(returnStudent);
+        }
+        System.out.println(returnStudent);
+        returnStudent = returnStudent + "]";
+
+        return returnStudent;
+
+    }
+    @GetMapping(path = "/update/{userName}")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
+    public  ResponseEntity updateStudent(@RequestBody Student student){
+        if (matchService.updateStudent(student)){
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
