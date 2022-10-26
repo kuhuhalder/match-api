@@ -1,6 +1,7 @@
 package com.match.matchapi;
 
 import lombok.Data;
+import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,7 +20,7 @@ public class Student {
     private String lastName;
     private String pronouns;
     private String campus;
-    private int year;
+    private Integer year;
     private String major;
     private String genderPreference;
     private String bio;
@@ -27,6 +28,6 @@ public class Student {
    // private ArrayList<String> courses;
     private String course;
 
-    private int isAdmin;
+    private Integer isAdmin;
 
 }

@@ -22,6 +22,7 @@ public class MatchController {
     private MatchService matchService;
 
     @GetMapping(path = "/getAll")
+    @ResponseBody
     public List<Student> fetchAllStudents() {
         return matchService.getAllStudents();
     }
@@ -50,9 +51,9 @@ public class MatchController {
     @GetMapping(path = "/getStudent/{userName}")
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
-    public String getStudent(@PathVariable String userName) throws JsonProcessingException {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        return ow.writeValueAsString(matchService.getStudent(userName));
+    public Student getStudent(@PathVariable String userName) throws JsonProcessingException {
+        //ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        return matchService.getStudent(userName);
     }
 
     @Transactional
@@ -88,5 +89,14 @@ public class MatchController {
 
         return returnStudent;
 
+    }
+    @GetMapping(path = "/update/{userName}")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
+    public  ResponseEntity updateStudent(@RequestBody Student student){
+        if (matchService.updateStudent(student)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
