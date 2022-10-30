@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Student {
     @Id
-    @NonNull
     private String id;
     @Indexed(unique = true)
     private String userName;
