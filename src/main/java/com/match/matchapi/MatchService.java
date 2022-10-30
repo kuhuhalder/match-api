@@ -114,7 +114,7 @@ public class MatchService {
         return true;
 
     }
-    public List<String> matchStudents (Student student) {
+    public List<Student> matchStudents (Student student) {
         Query query = new Query();
         query.addCriteria(Criteria.where("course").is(student.getCourse()));
         List<Student> students = mongoTemplate.find(query, Student.class);
@@ -123,10 +123,11 @@ public class MatchService {
                 students.remove(i);
             }
         }
-       List<String> studentIds = new ArrayList<>();
-        for(int i=0;i<students.size();i++) {
-            studentIds.add(students.get(i).getId());
-        }
-        return studentIds;
+//       List<String> studentIds = new ArrayList<>();
+//        for(int i=0;i<students.size();i++) {
+//            studentIds.add(students.get(i).getId());
+//        }
+//        return studentIds;
+        return students;
     }
 }
