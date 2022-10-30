@@ -66,27 +66,29 @@ public class MatchController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping(path = "/matches")
+    @GetMapping(path = "/matches/{userName}")
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
-    public String matchStudent(@RequestBody Student student) throws JsonProcessingException {
+    public List<String> matchStudent(@PathVariable String userName) throws JsonProcessingException {
         System.out.println("GOT HERE");
-        List<Student> students = matchService.matchStudents(student);
+        Student studentObject= getStudent(userName);
+        List<String> students = matchService.matchStudents(studentObject);
         System.out.println(students);
-        String returnStudent = "[";
-        if(students == null || students.size() <= 0){
-            return "No matches";
-        }
-
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        returnStudent  = ow.writeValueAsString(matchService.matchStudents(student));
-        for(int i = 1; i<students.size(); i++) {
-            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(student));
-        }
-        System.out.println(returnStudent);
-        returnStudent = returnStudent + "]";
-
-        return returnStudent;
+//        String returnStudent = "[";
+//        if(students == null || students.size() <= 0){
+//            return "No matches";
+//        }
+//
+//        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//        returnStudent  = ow.writeValueAsString(matchService.matchStudents(studentObject));
+//        for(int i = 1; i<students.size(); i++) {
+//            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(studentObject));
+//        }
+//        System.out.println(returnStudent);
+//        returnStudent = returnStudent + "]";
+//
+//        return returnStudent;
+        return students;
 
     }
     @PostMapping(path = "/update")
