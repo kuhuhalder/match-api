@@ -70,10 +70,10 @@ public class MatchController {
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
     public List<Student> matchStudent(@PathVariable String userName) throws JsonProcessingException {
-        System.out.println("GOT HERE");
+
         Student studentObject= getStudent(userName);
         List<Student> students = matchService.matchStudents(studentObject);
-        System.out.println(students);
+
 //        String returnStudent = "[";
 //        if(students == null || students.size() <= 0){
 //            return "No matches";
