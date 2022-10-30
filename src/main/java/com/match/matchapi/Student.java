@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Student {
     @Id
+    @NonNull
     private String id;
     @Indexed(unique = true)
     private String userName;
@@ -30,4 +31,20 @@ public class Student {
 
     private Integer isAdmin;
 
+    public void print() {
+        System.out.println("id : " + this.id);
+        System.out.println("userName : " + this.userName);
+        System.out.println("password : " + this.password);
+        System.out.println("firstName : " + this.firstName);
+        System.out.println("lastName : " + this.lastName);
+        System.out.println("pronouns : " + this.pronouns);
+        System.out.println("campus : " + this.campus);
+        System.out.println("year : " + this.year);
+        System.out.println("major : " + this.major);
+        System.out.println("genderPreference : " + this.genderPreference);
+        System.out.println("bio : " + this.bio);
+        System.out.println("course : " + this.course);
+        System.out.println("isAdmin : " + this.isAdmin);
+
+    }
 }

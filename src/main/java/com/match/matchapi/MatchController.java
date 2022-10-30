@@ -23,6 +23,7 @@ public class MatchController {
 
     @GetMapping(path = "/getAll")
     @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
     public List<Student> fetchAllStudents() {
         return matchService.getAllStudents();
     }
@@ -88,10 +89,11 @@ public class MatchController {
         return returnStudent;
 
     }
-    @GetMapping(path = "/update/{userName}")
+    @PostMapping(path = "/update")
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
     public  ResponseEntity updateStudent(@RequestBody Student student){
+        student.print();
         if (matchService.updateStudent(student)){
             return ResponseEntity.ok().build();
         }

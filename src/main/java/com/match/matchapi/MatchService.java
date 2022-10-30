@@ -76,14 +76,13 @@ public class MatchService {
             return false;
         }
 
+        student.setUserName(students.get(0).getUserName());
+
         if(student.getCourse() == null){
             student.setCourse(students.get(0).getCourse());
         }
         if(student.getCampus() == null){
             student.setCampus(students.get(0).getCampus());
-        }
-        if(student.getUserName() == null){
-            student.setUserName(students.get(0).getUserName());
         }
         if(student.getFirstName() == null){
             student.setFirstName(students.get(0).getFirstName());
