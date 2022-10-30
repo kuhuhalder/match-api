@@ -69,10 +69,10 @@ public class MatchController {
     @GetMapping(path = "/matches/{userName}")
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
-    public List<String> matchStudent(@PathVariable String userName) throws JsonProcessingException {
+    public List<Student> matchStudent(@PathVariable String userName) throws JsonProcessingException {
         System.out.println("GOT HERE");
         Student studentObject= getStudent(userName);
-        List<String> students = matchService.matchStudents(studentObject);
+        List<Student> students = matchService.matchStudents(studentObject);
         System.out.println(students);
 //        String returnStudent = "[";
 //        if(students == null || students.size() <= 0){
