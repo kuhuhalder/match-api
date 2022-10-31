@@ -173,7 +173,6 @@ public class MatchService {
 
         //NOW MERGESORT
 
-
 //        for(int i=0;i<students.size();i++) {
 //            if(students.get(i).getUserName().equals(student.getUserName())) {
 //                students.remove(i);
@@ -186,4 +185,78 @@ public class MatchService {
 //        return studentIds;
         //return students;
     }
+
+    private void merge(List<Integer> points,List<Student> students,int l,int m, int r) {
+        // Find sizes of two subarrays to be merged
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        /* Create temp arrays */
+        int Lpoints[] = new int[n1];
+        int Rpoints[] = new int[n2];
+
+        Student Lstudents[] = new Student[n1];
+        Student Rstudents[] = new Student[n2];
+
+        /*Copy data to temp arrays*/
+        for (int i = 0; i < n1; ++i)
+            Lpoints[i] = points.get(l + i);
+        for (int j = 0; j < n2; ++j)
+            Rpoints[j] = points.get(m + 1 + j);
+
+        for (int i = 0; i < n1; ++i)
+            Lstudents[i] = students.get(l + i);
+        for (int j = 0; j < n2; ++j)
+            Rstudents[j] = students.get(m + 1 + j);
+
+        // Initial indexes of first and second subarrays
+        int i = 0, j = 0;
+
+        // Initial index of merged subarray array
+        int k = l;
+        while (i < n1 && j < n2) {
+            if (Lpoints[i] <= Rpoints[j]) {
+                points.add(k, Lpoints[i]);
+                students.add(k,Lstudents[i]);
+                i++;
+            }
+            else {
+                points.add(k, Rpoints[j]);
+                students.add(k,Rstudents[j]);
+                j++;
+            }
+            k++;
+        }
+
+        /* Copy remaining elements of L[] if any */
+        while (i < n1) {
+            points.add(k, Lpoints[i]);
+            students.add(k,Lstudents[i]);
+            i++;
+            k++;
+        }
+
+        /* Copy remaining elements of R[] if any */
+        while (j < n2) {
+            points.add(k,Rpoints[j]);
+            students.add(k,Rstudents[j]);
+            j++;
+            k++;
+        }
+    }
+    void sort(List<Integer> points,List<Student> students, int l, int r)
+    {
+        if (l < r) {
+            // Find the middle point
+            int m = l + (r - l) / 2;
+
+            // Sort first and second halves
+            sort(points,students, l, m);
+            sort(points,students, m + 1, r);
+
+            // Merge the sorted halves
+            merge(points, students, l, m, r);
+        }
+    }
+
 }
