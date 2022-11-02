@@ -231,14 +231,6 @@ public class MatchService {
         List<Integer> points = new ArrayList<>();
 
         for(int i=0;i<allStudents.size();i++) {
-            System.out.println("string1");
-            System.out.println(allStudents.get(i));
-            System.out.println("string2");
-            System.out.println(allStudents.get(i).getUserName());
-            System.out.println("string3");
-            System.out.println(student);
-            System.out.println("string4");
-            System.out.println(student.getUserName());
             if(allStudents.get(i).getUserName().equals(student.getUserName())) {
                 allStudents.remove(i);
                 break;
@@ -248,11 +240,9 @@ public class MatchService {
         for(int i = 0; i < allStudents.size(); i++){
             points.add(similarityIndex(student, allStudents.get(i)));
         }
-        System.out.println(allStudents);
-        System.out.println(points);
+
         sort(points,allStudents,0,allStudents.size()-1);
-        System.out.println(allStudents);
-        System.out.println(points);
+
         return allStudents;
 
 
