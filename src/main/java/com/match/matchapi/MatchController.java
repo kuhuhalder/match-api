@@ -71,8 +71,8 @@ public class MatchController {
     @CrossOrigin(origins="http://localhost:3000")
     public List<Student> matchStudent(@PathVariable String userName) throws JsonProcessingException {
 
-        Student studentObject= getStudent(userName);
-        List<Student> students = matchService.matchStudents(studentObject);
+        //Student studentObject= getStudent(userName);
+        List<Student> students = matchService.matchStudent(userName);
 
 //        String returnStudent = "[";
 //        if(students == null || students.size() <= 0){
