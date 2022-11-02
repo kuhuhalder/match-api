@@ -114,20 +114,154 @@ public class MatchService {
         return true;
 
     }
-    public List<Student> matchStudents (Student student) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("course").is(student.getCourse()));
-        List<Student> students = mongoTemplate.find(query, Student.class);
-        for(int i=0;i<students.size();i++) {
-            if(students.get(i).getUserName().equals(student.getUserName())) {
-                students.remove(i);
+
+    private void merge(List<Integer> points,List<Student> students,int l,int m, int r) {
+
+
+        /* Create temp arrays */
+        int Lpoints[] = new int[m - l + 3];
+        int Rpoints[] = new int[r - m + 3];
+
+        Student Lstudents[] = new Student[m - l + 3];
+        Student Rstudents[] = new Student[r - m + 3];
+
+        /*Copy data to temp arrays*/
+        for (int i = l; i <= m; i++) {
+            Lpoints[i - l] = points.get(i);
+            Lstudents[i - l] = students.get(i);
+        }
+        for (int j = m+1; j <= r; j++) {
+            Rpoints[j - (m + 1)] = points.get(j);
+            Rstudents[j - (m + 1)] = students.get(j);
+        }
+
+        int i = l, j = m+1;
+
+        int k = l;
+        while (i <= m && j <= r) {
+            if (Lpoints[i-l] >= Rpoints[j-(m+1)]) {
+                points.set(k, Lpoints[i-l]);
+                students.set(k,Lstudents[i-l]);
+                i++;
+                k++;
+            }
+            else {
+                points.set(k, Rpoints[j-(m+1)]);
+                students.set(k, Rstudents[j-(m+1)]);
+                j++;
+                k++;
             }
         }
-//       List<String> studentIds = new ArrayList<>();
-//        for(int i=0;i<students.size();i++) {
-//            studentIds.add(students.get(i).getId());
-//        }
-//        return studentIds;
-        return students;
+
+        //jhjghj
+        /* Copy remaining elements of L[] if any */
+        while (i <= m) {
+            points.set(k, Lpoints[i-l]);
+            students.set(k,Lstudents[i-l]);
+            i++;
+            k++;
+        }
+
+        /* Copy remaining elements of R[] if any */
+        while (j <= l) {
+            points.set(k,Rpoints[j-(m+1)]);
+            students.set(k,Rstudents[j-(m+1)]);
+            j++;
+            k++;
+        }
     }
+    void sort(List<Integer> points,List<Student> students, int l, int r)
+    {
+        if(r <= l){
+            return;
+        }
+        if (l < r) {
+            // Find the middle point
+            int m = (r + l) / 2;
+
+            // Sort first and second halves
+            sort(points,students, l, m);
+            sort(points,students, m + 1, r);
+
+            // Merge the sorted halves
+            merge(points, students, l, m, r);
+        }
+    }
+
+    private Integer similarityIndex(Student student1, Student student2) {
+        int points = 0;
+        if(student1.getMajor()!=null && student2.getMajor()!=null) {
+            if (student1.getMajor().equals(student2.getMajor())) {
+                points += 2;
+            }
+        }
+
+        if(student1.getYear()!=null && student2.getYear()!=null) {
+            if (student1.getYear().equals(student2.getYear())) {
+                points += 1;
+            }
+        }
+
+        if(student1.getCampus()!=null && student2.getCampus()!=null) {
+            if (student1.getCampus().equals(student2.getCampus())) {
+                points += 2;
+            }
+        }
+
+        if(student1.getGenderPreference()!=null && student2.getGenderPreference()!=null) {
+            if (student1.getGenderPreference().equals(student2.getGenderPreference())) {
+                points += 2;
+            }
+        }
+
+        return points;
+
+    }
+
+    public List<Student> matchStudent (String userName) {
+
+        Student student = getStudent(userName);
+        if(student==null) {
+            return null;
+        }
+        //list of all students
+        List<Student> allStudents = getAllStudents();
+
+        //points array
+        List<Integer> points = new ArrayList<>();
+
+        for(int i=0;i<allStudents.size();i++) {
+            System.out.println("string1");
+            System.out.println(allStudents.get(i));
+            System.out.println("string2");
+            System.out.println(allStudents.get(i).getUserName());
+            System.out.println("string3");
+            System.out.println(student);
+            System.out.println("string4");
+            System.out.println(student.getUserName());
+            if(allStudents.get(i).getUserName().equals(student.getUserName())) {
+                allStudents.remove(i);
+                break;
+            }
+        }
+
+        for(int i = 0; i < allStudents.size(); i++){
+            points.add(similarityIndex(student, allStudents.get(i)));
+        }
+        System.out.println(allStudents);
+        System.out.println(points);
+        sort(points,allStudents,0,allStudents.size()-1);
+        System.out.println(allStudents);
+        System.out.println(points);
+        return allStudents;
+
+
+    }
+
+
+
+
+
+
+
 }
