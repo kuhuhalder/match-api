@@ -74,20 +74,6 @@ public class MatchController {
         //Student studentObject= getStudent(userName);
         List<Student> students = matchService.matchStudent(userName);
 
-//        String returnStudent = "[";
-//        if(students == null || students.size() <= 0){
-//            return "No matches";
-//        }
-//
-//        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//        returnStudent  = ow.writeValueAsString(matchService.matchStudents(studentObject));
-//        for(int i = 1; i<students.size(); i++) {
-//            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(studentObject));
-//        }
-//        System.out.println(returnStudent);
-//        returnStudent = returnStudent + "]";
-//
-//        return returnStudent;
         return students;
 
     }

@@ -214,6 +214,10 @@ public class MatchService {
             }
         }
 
+        if(student1.getCourse()!=null && student2.getCourse()!=null) {
+
+        }
+
         return points;
 
     }
