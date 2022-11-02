@@ -215,7 +215,13 @@ public class MatchService {
         }
 
         if(student1.getCourse()!=null && student2.getCourse()!=null) {
-
+            for(int i=0;i<student1.getCourse().size();i++)  {
+                for(int j=0;j<student2.getCourse().size();j++) {
+                    if(student1.getCourse().get(i).equals(student2.getCourse().get(j))) {
+                        points+=3;
+                    }
+                }
+            }
         }
 
         return points;
@@ -246,6 +252,8 @@ public class MatchService {
         }
 
         sort(points,allStudents,0,allStudents.size()-1);
+
+
 
         return allStudents;
 
