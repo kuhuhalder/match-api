@@ -15,13 +15,16 @@ import java.util.List;
 public class MatchService {
 
     @Autowired
+    private final StudentRepository studentRepository;
+
+    @Autowired
     private final MatchRepository matchRepository;
 
     @Autowired
     private final MongoTemplate mongoTemplate;
 
     public List<Student> getAllStudents() {
-        return matchRepository.findAll();
+        return studentRepository.findAll();
     }
 
     public boolean validation(String username, String password) {
@@ -47,7 +50,7 @@ public class MatchService {
         if (students.size() > 0){
             return false;
         }
-        matchRepository.insert(student);
+        studentRepository.insert(student);
         return true;
     }
 
@@ -59,7 +62,7 @@ public class MatchService {
             return false;
         }
 
-            matchRepository.deleteById(students.get(0).getId());
+            studentRepository.deleteById(students.get(0).getId());
             return true;
 
     }
@@ -109,8 +112,8 @@ public class MatchService {
             student.setGenderPreference(students.get(0).getGenderPreference());
         }
 
-        matchRepository.deleteById(student.getId());
-        matchRepository.insert(student);
+        studentRepository.deleteById(student.getId());
+        studentRepository.insert(student);
         return true;
 
     }
@@ -261,9 +264,56 @@ public class MatchService {
     }
 
 
+    public boolean addMatches(Matches match) {
 
+        if(match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null){
 
+            System.out.println(match.getId());
+            return false;
+        }
 
+        if(!match.getId().equals(match.getUserOneId() + "+" + match.getUserTwoId())){
+            System.out.println(match.getId() + "+" + match.getUserTwoId() + match.getUserOneId());
+            return false;
+        }
 
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(match.getUserOneId() + "+" + match.getUserTwoId()).orOperator(
+                Criteria.where("id").is(match.getUserTwoId() + "+" + match.getUserOneId())
+        ));
+        List<Matches> matches = mongoTemplate.find(query, Matches.class);
 
+        System.out.println(matches);
+
+        if (matches.size() > 0){
+
+            System.out.println(matches.size() + "userTwoId");
+            return false;
+        }
+
+        Query query2 = new Query();
+        query2.addCriteria(Criteria.where("userName").is(match.getUserOneId())
+                .orOperator(Criteria.where("userName").is(match.getUserTwoId())));
+        List<Student> students = mongoTemplate.find(query2, Student.class);
+
+        Student student1 = studentRepository.findById(match.getUserOneId()).get();
+        Student student2 = studentRepository.findById(match.getUserTwoId()).get();
+
+        if(student1 == null || student2 == null){
+            return false;
+        }
+
+        System.out.println(student2);
+        System.out.println(student1);
+
+        System.out.println(students);
+
+        if(students.size() != 2){
+            System.out.println("FAKEuserTwoId");
+            //return false;
+        }
+
+        matchRepository.insert(match);
+        return true;
+    }
 }

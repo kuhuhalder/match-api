@@ -40,6 +40,18 @@ public class MatchController {
         }
     }
 
+    @Transactional
+    @PostMapping(path = "/matchAdd")
+    @CrossOrigin(origins="http://localhost:3000")
+    public ResponseEntity addMatch(@RequestBody Matches match){
+        if(matchService.addMatches(match)) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping(path = "/validate/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity validation(@PathVariable String userName, @PathVariable String password){
