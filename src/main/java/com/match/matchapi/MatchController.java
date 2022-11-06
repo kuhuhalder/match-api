@@ -99,4 +99,14 @@ public class MatchController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    @GetMapping(path = "areMatched/{userName1}/{userName2}")
+    @CrossOrigin(origins="http://localhost:3000")
+    public ResponseEntity matchExists(@PathVariable String userName1, @PathVariable String userName2){
+        if (matchService.matchExists(userName1, userName2)){
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.ok(false);
+    }
+
 }
