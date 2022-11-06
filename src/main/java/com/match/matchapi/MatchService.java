@@ -222,6 +222,7 @@ public class MatchService {
                 for(int j=0;j<student2.getCourse().size();j++) {
                     if(student1.getCourse().get(i).equals(student2.getCourse().get(j))) {
                         points+=3;
+                        break;
                     }
                 }
             }
