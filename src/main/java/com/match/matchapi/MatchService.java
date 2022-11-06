@@ -267,50 +267,39 @@ public class MatchService {
     public boolean addMatches(Matches match) {
 
         if(match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null){
-
-            System.out.println(match.getId());
             return false;
         }
 
         if(!match.getId().equals(match.getUserOneId() + "+" + match.getUserTwoId())){
-            System.out.println(match.getId() + "+" + match.getUserTwoId() + match.getUserOneId());
             return false;
         }
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(match.getUserOneId() + "+" + match.getUserTwoId()).orOperator(
+        query.addCriteria(new Criteria().orOperator(
+                Criteria.where("id").is(match.getUserOneId() + "+" + match.getUserTwoId()),
                 Criteria.where("id").is(match.getUserTwoId() + "+" + match.getUserOneId())
         ));
+
         List<Matches> matches = mongoTemplate.find(query, Matches.class);
 
         System.out.println(matches);
 
         if (matches.size() > 0){
-
-            System.out.println(matches.size() + "userTwoId");
             return false;
         }
 
         Query query2 = new Query();
-        query2.addCriteria(Criteria.where("userName").is(match.getUserOneId())
-                .orOperator(Criteria.where("userName").is(match.getUserTwoId())));
+        query2.addCriteria(new Criteria().orOperator(
+                Criteria.where("userName").is(match.getUserOneId()),
+                Criteria.where("userName").is(match.getUserTwoId())
+        ));
+
         List<Student> students = mongoTemplate.find(query2, Student.class);
-
-        Student student1 = studentRepository.findById(match.getUserOneId()).get();
-        Student student2 = studentRepository.findById(match.getUserTwoId()).get();
-
-        if(student1 == null || student2 == null){
-            return false;
-        }
-
-        System.out.println(student2);
-        System.out.println(student1);
 
         System.out.println(students);
 
         if(students.size() != 2){
-            System.out.println("FAKEuserTwoId");
-            //return false;
+            return false;
         }
 
         matchRepository.insert(match);
