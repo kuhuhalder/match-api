@@ -40,6 +40,18 @@ public class MatchController {
         }
     }
 
+    @Transactional
+    @PostMapping(path = "/matchAdd")
+    @CrossOrigin(origins="http://localhost:3000")
+    public ResponseEntity addMatch(@RequestBody Matches match){
+        if(matchService.addMatches(match)) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping(path = "/validate/{userName}/{password}")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity validation(@PathVariable String userName, @PathVariable String password){
@@ -74,20 +86,6 @@ public class MatchController {
         //Student studentObject= getStudent(userName);
         List<Student> students = matchService.matchStudent(userName);
 
-//        String returnStudent = "[";
-//        if(students == null || students.size() <= 0){
-//            return "No matches";
-//        }
-//
-//        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//        returnStudent  = ow.writeValueAsString(matchService.matchStudents(studentObject));
-//        for(int i = 1; i<students.size(); i++) {
-//            returnStudent = returnStudent + "," + ow.writeValueAsString(matchService.matchStudents(studentObject));
-//        }
-//        System.out.println(returnStudent);
-//        returnStudent = returnStudent + "]";
-//
-//        return returnStudent;
         return students;
 
     }
