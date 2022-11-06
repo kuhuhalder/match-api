@@ -264,6 +264,22 @@ public class MatchService {
     }
 
 
+    public boolean matchExists(String userName1, String userName2) {
+        Query query = new Query();
+        query.addCriteria(new Criteria().orOperator(
+                Criteria.where("id").is(userName1 + "+" + userName2),
+                Criteria.where("id").is(userName2+ "+" + userName1)
+        ));
+
+        List<Matches> matches = mongoTemplate.find(query, Matches.class);
+
+        if (matches.isEmpty()){
+            return false;
+        }
+
+        return true;
+    }
+
     public boolean addMatches(Matches match) {
 
         if(match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null){
@@ -274,17 +290,7 @@ public class MatchService {
             return false;
         }
 
-        Query query = new Query();
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("id").is(match.getUserOneId() + "+" + match.getUserTwoId()),
-                Criteria.where("id").is(match.getUserTwoId() + "+" + match.getUserOneId())
-        ));
-
-        List<Matches> matches = mongoTemplate.find(query, Matches.class);
-
-        System.out.println(matches);
-
-        if (matches.size() > 0){
+        if(matchExists(match.getUserOneId(), match.getUserTwoId())){
             return false;
         }
 
@@ -305,4 +311,6 @@ public class MatchService {
         matchRepository.insert(match);
         return true;
     }
+
+
 }
