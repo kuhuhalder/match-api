@@ -23,6 +23,17 @@ public class MatchService {
     @Autowired
     private final MongoTemplate mongoTemplate;
 
+    private static int BADREQUEST = -1;
+    private static int REQUESTSENT = 0;
+    private static int REQUESTSENTANDMATCHED = 1;
+    private static int REQUESTEXISTS = 2;
+    private static int ALREADYMATCHED = 3;
+
+    private static int NOUSERREQUESTED = -1;
+    private static int USER1REQUESTEDUSER2 = 0;
+    private static int USER2REQUESTEDUSER1 = 1;
+    private static int MATCHED = 2;
+
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
@@ -257,42 +268,45 @@ public class MatchService {
 
         sort(points,allStudents,0,allStudents.size()-1);
 
-
-
         return allStudents;
-
-
     }
 
 
-    public boolean matchExists(String userName1, String userName2) {
-        Query query = new Query();
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("id").is(userName1 + "+" + userName2),
-                Criteria.where("id").is(userName2+ "+" + userName1)
-        ));
+    public int matchExists(String userName1, String userName2) {
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("id").is(userName1 + "+" + userName2));
 
-        List<Matches> matches = mongoTemplate.find(query, Matches.class);
+        List<Matches> matches1 = mongoTemplate.find(query1, Matches.class);
 
-        if (matches.isEmpty()){
-            return false;
+        Query query2 = new Query();
+        query2.addCriteria(Criteria.where("id").is(userName2+ "+" + userName1));
+
+        List<Matches> matches2 = mongoTemplate.find(query2, Matches.class);
+
+        if((matches1 != null) && (matches2 != null) &&
+                (matches1.size()>0) && (matches2.size()>0)){
+            return MATCHED;
         }
 
-        return true;
+        if((matches1 != null) && (matches1.size()>0)){
+            return USER1REQUESTEDUSER2;
+        }
+
+        if((matches1 != null) && (matches1.size()>0)){
+            return USER2REQUESTEDUSER1;
+        }
+
+        return NOUSERREQUESTED;
     }
 
-    public boolean addMatches(Matches match) {
+    public int addMatches(Matches match) {
 
         if(match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null){
-            return false;
+            return BADREQUEST;
         }
 
         if(!match.getId().equals(match.getUserOneId() + "+" + match.getUserTwoId())){
-            return false;
-        }
-
-        if(matchExists(match.getUserOneId(), match.getUserTwoId())){
-            return false;
+            return BADREQUEST;
         }
 
         Query query2 = new Query();
@@ -306,11 +320,21 @@ public class MatchService {
         System.out.println(students);
 
         if(students.size() != 2){
-            return false;
+            return BADREQUEST;
+        }
+
+        int matchExistsVar = matchExists(match.getUserOneId(), match.getUserTwoId());
+
+        if(matchExistsVar == MATCHED){
+            return ALREADYMATCHED;
+        }
+
+        if(matchExistsVar == USER1REQUESTEDUSER2){
+            return REQUESTEXISTS;
         }
 
         matchRepository.insert(match);
-        return true;
+        return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
     }
 
 

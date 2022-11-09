@@ -44,7 +44,7 @@ public class MatchController {
     @PostMapping(path = "/matchAdd")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity addMatch(@RequestBody Matches match){
-        if(matchService.addMatches(match)) {
+        if(matchService.addMatches(match) == 0) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         else {
@@ -102,11 +102,8 @@ public class MatchController {
 
     @GetMapping(path = "areMatched/{userName1}/{userName2}")
     @CrossOrigin(origins="http://localhost:3000")
-    public ResponseEntity matchExists(@PathVariable String userName1, @PathVariable String userName2){
-        if (matchService.matchExists(userName1, userName2)){
-            return ResponseEntity.ok(true);
-        }
-        return ResponseEntity.ok(false);
+    public int matchExists(@PathVariable String userName1, @PathVariable String userName2){
+        return matchService.matchExists(userName1, userName2);
     }
 
 }
