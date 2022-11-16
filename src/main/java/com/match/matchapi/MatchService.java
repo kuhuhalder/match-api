@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class MatchService {
     private static int USER2REQUESTEDUSER1 = 1;
     private static int MATCHED = 2;
 
+    private static int ALERTREQUEST = 0;
+    private static int ALERTMATCH = 1;
+
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
@@ -51,6 +55,19 @@ public class MatchService {
         }
 
         return students.size() == 1;
+    }
+
+    public boolean studentExists(String username){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userName").is(username));
+
+        List<Student> students = mongoTemplate.find(query, Student.class);
+
+        if((students == null) || (students.size() != 1)){
+            return false;
+        }
+
+        return true;
     }
 
     public boolean addStudent(Student student) {
@@ -243,7 +260,7 @@ public class MatchService {
 
     }
 
-    public List<Student> matchStudent (String userName) {
+    public List<Student> findBuddies(String userName) {
 
         Student student = getStudent(userName);
         if(student==null) {
@@ -309,17 +326,9 @@ public class MatchService {
             return BADREQUEST;
         }
 
-        Query query2 = new Query();
-        query2.addCriteria(new Criteria().orOperator(
-                Criteria.where("userName").is(match.getUserOneId()),
-                Criteria.where("userName").is(match.getUserTwoId())
-        ));
 
-        List<Student> students = mongoTemplate.find(query2, Student.class);
 
-        System.out.println(students);
-
-        if(students.size() != 2){
+        if(!(studentExists(match.getUserOneId()) && studentExists(match.getUserTwoId()))){
             return BADREQUEST;
         }
 
@@ -338,4 +347,51 @@ public class MatchService {
     }
 
 
+    public List<String> alertsHelper(String userName, int indicator) {
+        if(!studentExists(userName)){
+            return null;
+        }
+
+        Query queryReceived = new Query();
+        queryReceived.addCriteria(Criteria.where("userTwoId").is(userName));
+
+        List<Matches> requestsReceived = mongoTemplate.find(queryReceived, Matches.class);
+
+        Query querySent = new Query();
+        querySent.addCriteria(Criteria.where("userOneId").is(userName));
+
+        List<Matches> requestsSent = mongoTemplate.find(querySent, Matches.class);
+
+        List<String> buddies = new ArrayList<>();
+
+        for(int i = 0; i<requestsSent.size(); i++){
+            for(int j = 0; j<requestsReceived.size(); j++){
+                if(requestsReceived.get(j).getUserOneId().equals(requestsSent.get(i).getUserTwoId())){
+                    buddies.add(requestsReceived.get(j).getUserOneId());
+                    break;
+                }
+            }
+        }
+
+        if(indicator == ALERTMATCH){
+            return buddies;
+        }
+
+        List<String> requests = new ArrayList<>();
+
+        for(int i = 0; i<requestsReceived.size(); i++){
+            if(!buddies.contains(requestsReceived.get(i).getUserOneId())){
+                requests.add(requestsReceived.get(i).getUserOneId());
+            }
+        }
+        return requests;
+    }
+
+    public List<String> findRequests(String username){
+        return alertsHelper(username, ALERTREQUEST);
+    }
+
+    public List<String> findConfirmedMatches(String username){
+        return alertsHelper(username, ALERTMATCH);
+    }
 }
