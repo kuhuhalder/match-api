@@ -19,6 +19,9 @@ public class MatchService {
     private final StudentRepository studentRepository;
 
     @Autowired
+    private final CourseRepository courseRepository;
+
+    @Autowired
     private final MatchRepository matchRepository;
 
     @Autowired
@@ -78,6 +81,7 @@ public class MatchService {
         if (students.size() > 0){
             return false;
         }
+
         studentRepository.insert(student);
         return true;
     }
@@ -112,6 +116,7 @@ public class MatchService {
         if(student.getCourse() == null){
             student.setCourse(students.get(0).getCourse());
         }
+
         if(student.getCampus() == null){
             student.setCampus(students.get(0).getCampus());
         }
@@ -394,4 +399,40 @@ public class MatchService {
     public List<String> findConfirmedMatches(String username){
         return alertsHelper(username, ALERTMATCH);
     }
+
+    public boolean addCourse(Course course) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(course.getId()));
+        List<Course> courses = mongoTemplate.find(query, Course.class);
+
+        if (courses.size() > 0){
+            return false;
+        }
+        courseRepository.insert(course);
+        return true;
+    }
+
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    public Course getCourseById(String id) {
+        return mongoTemplate.findById(id, Course.class);
+    }
+
+    public boolean deleteCourse(String id) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(id));
+        List<Course> courses = mongoTemplate.find(query, Course.class);
+        if(courses == null) {
+            return false;
+        }
+
+        courseRepository.deleteById(courses.get(0).getId());
+        return true;
+
+    }
+
+
+
 }
