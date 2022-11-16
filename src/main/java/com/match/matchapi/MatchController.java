@@ -121,4 +121,40 @@ public class MatchController {
         return matchService.findConfirmedMatches(userName);
     }
 
+    @Transactional
+    @PostMapping(path = "/addCourse")
+    @CrossOrigin(origins="http://localhost:3000")
+    public ResponseEntity addCourse(@RequestBody Course course){
+        if(matchService.addCourse(course)) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(path = "/getAllCourses")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
+    public List<Course> fetchAllCourses() {
+        return matchService.getAllCourses();
+    }
+
+    @GetMapping(path = "/getCourseById/{id}")
+    @ResponseBody
+    @CrossOrigin(origins="http://localhost:3000")
+    public Course getCourse(@PathVariable String id) throws JsonProcessingException {
+        return matchService.getCourseById(id);
+    }
+
+    @Transactional
+    @DeleteMapping(path = "/deleteCourse/{id}")
+    @CrossOrigin(origins="http://localhost:3000")
+    public  ResponseEntity deleteCourse(@PathVariable String id){
+        if (matchService.deleteCourse(id)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
 }

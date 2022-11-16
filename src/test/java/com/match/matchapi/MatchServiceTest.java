@@ -18,12 +18,13 @@ class MatchServiceTest {
 
     @Mock private StudentRepository studentRepository;
     @Mock private MatchRepository matchRepository;
+    @Mock private CourseRepository courseRepository;
     @Mock private MongoTemplate mongoTemplate;
     private MatchService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new MatchService(studentRepository,matchRepository,mongoTemplate);
+        underTest = new MatchService(studentRepository,courseRepository,matchRepository,mongoTemplate);
     }
 
     @Test
