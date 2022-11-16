@@ -44,7 +44,8 @@ public class MatchController {
     @PostMapping(path = "/matchAdd")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity addMatch(@RequestBody Matches match){
-        if(matchService.addMatches(match) == 0) {
+        int resultVar = matchService.addMatches(match);
+        if(resultVar != -1 && resultVar != 2 && resultVar != 3) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         else {
@@ -93,7 +94,6 @@ public class MatchController {
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
     public  ResponseEntity updateStudent(@RequestBody Student student){
-        student.print();
         if (matchService.updateStudent(student)){
             return ResponseEntity.ok().build();
         }
