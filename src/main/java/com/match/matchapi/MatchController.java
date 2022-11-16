@@ -44,7 +44,8 @@ public class MatchController {
     @PostMapping(path = "/matchAdd")
     @CrossOrigin(origins="http://localhost:3000")
     public ResponseEntity addMatch(@RequestBody Matches match){
-        if(matchService.addMatches(match)) {
+        int resultVar = matchService.addMatches(match);
+        if(resultVar != -1 && resultVar != 2 && resultVar != 3) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         else {
@@ -81,10 +82,10 @@ public class MatchController {
     @GetMapping(path = "/matches/{userName}")
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
-    public List<Student> matchStudent(@PathVariable String userName) throws JsonProcessingException {
+    public List<Student> findBuddies(@PathVariable String userName) throws JsonProcessingException {
 
         //Student studentObject= getStudent(userName);
-        List<Student> students = matchService.matchStudent(userName);
+        List<Student> students = matchService.findBuddies(userName);
 
         return students;
 
@@ -93,7 +94,6 @@ public class MatchController {
     @ResponseBody
     @CrossOrigin(origins="http://localhost:3000")
     public  ResponseEntity updateStudent(@RequestBody Student student){
-        student.print();
         if (matchService.updateStudent(student)){
             return ResponseEntity.ok().build();
         }
@@ -102,11 +102,23 @@ public class MatchController {
 
     @GetMapping(path = "areMatched/{userName1}/{userName2}")
     @CrossOrigin(origins="http://localhost:3000")
-    public ResponseEntity matchExists(@PathVariable String userName1, @PathVariable String userName2){
-        if (matchService.matchExists(userName1, userName2)){
-            return ResponseEntity.ok(true);
-        }
-        return ResponseEntity.ok(false);
+    @ResponseBody
+    public int matchExists(@PathVariable String userName1, @PathVariable String userName2){
+        return matchService.matchExists(userName1, userName2);
+    }
+
+    @GetMapping(path = "findRequests/{userName}")
+    @CrossOrigin(origins="http://localhost:3000")
+    @ResponseBody
+    public List<String> findRequests(@PathVariable String userName){
+        return matchService.findRequests(userName);
+    }
+
+    @GetMapping(path = "findConfirmedMatches/{userName}")
+    @CrossOrigin(origins="http://localhost:3000")
+    @ResponseBody
+    public List<String> findConfirmedMatches(@PathVariable String userName){
+        return matchService.findConfirmedMatches(userName);
     }
 
 }
