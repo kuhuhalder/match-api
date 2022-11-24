@@ -32,6 +32,8 @@ public class Student {
 
     private Integer isAdmin;
 
+
+
     public void print() {
         System.out.println("id : " + this.id);
         System.out.println("userName : " + this.userName);
