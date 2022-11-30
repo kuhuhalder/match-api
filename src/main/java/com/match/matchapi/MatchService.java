@@ -57,7 +57,7 @@ public class MatchService {
             return false;
         }
 
-        return students.size() == 1;
+        return students.size()==1;
     }
 
     public boolean studentExists(String username){
@@ -350,6 +350,36 @@ public class MatchService {
         matchRepository.insert(match);
         return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
     }
+
+    public boolean addMatch(Matches match){
+
+        int matchExistsVar = matchExists(match.getUserOneId(), match.getUserTwoId());
+        if(matchExistsVar != MATCHED){
+            matchRepository.insert(match);
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    public boolean deleteMatch(Matches match){
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(match.getId()));
+        List<Matches> matches = mongoTemplate.find(query, Matches.class);
+        if(matches == null) {
+            return false;
+        }
+        matchRepository.deleteById(matches.get(0).getId());
+        return true;
+
+    }
+
+//    public static List<Matches> viewAllStudyBuddies(){
+//        MatchRepository.findAll();
+//    }
 
 
     public List<String> alertsHelper(String userName, int indicator) {
