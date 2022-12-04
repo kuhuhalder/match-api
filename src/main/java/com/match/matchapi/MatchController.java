@@ -158,4 +158,22 @@ public class MatchController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @GetMapping(path = "/getAllConfirmedMatches")
+    @ResponseBody
+    @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
+    public List<Matches> getAllConfirmedMatches() {
+        return matchService.getAllConfirmedMatches();
+    }
+
+    @Transactional
+    @DeleteMapping(path = "/deleteMatch/{userName}")
+    @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
+    public  ResponseEntity deleteMatch(@PathVariable String userName){
+        System.out.println(userName);
+        if (matchService.deleteMatch(userName)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
 }

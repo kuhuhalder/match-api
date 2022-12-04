@@ -378,23 +378,10 @@ public class MatchService {
         return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
     }
 
-    public boolean addMatch(Matches match){
-
-        int matchExistsVar = matchExists(match.getUserOneId(), match.getUserTwoId());
-        if(matchExistsVar != MATCHED){
-            matchRepository.insert(match);
-            return true;
-        }
-        else{
-            return false;
-        }
-
-    }
-
-    public boolean deleteMatch(Matches match){
-
+    public boolean deleteMatch(String userName){
+        System.out.println(userName);
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(match.getId()));
+        query.addCriteria(Criteria.where("id").is(userName));
         List<Matches> matches = mongoTemplate.find(query, Matches.class);
         if(matches == null) {
             return false;
@@ -489,6 +476,28 @@ public class MatchService {
         return true;
 
     }
+
+    public List<Matches> getAllConfirmedMatches() {
+        List<Matches> allMatches = matchRepository.findAll();
+        List<Matches> confirmedMatches = new ArrayList<>();
+        int[] indicator = new int [allMatches.size()];
+        for(int i=0;i<allMatches.size();i++){
+            if(indicator[i]!=1) {
+                for (int j = i + 1; j < allMatches.size(); j++) {
+                    if(allMatches.get(i).getUserOneId().equals(allMatches.get(j).getUserTwoId()) &&
+                        allMatches.get(i).getUserTwoId().equals(allMatches.get(j).getUserOneId())) {
+                        indicator[i]=1;
+                        indicator[j]=1;
+                        confirmedMatches.add(allMatches.get(i));
+                        break;
+                    }
+                }
+            }
+        }
+        return confirmedMatches;
+    }
+
+
 
 
 
