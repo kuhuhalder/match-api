@@ -42,12 +42,20 @@ public class MatchService {
     private static int ALERTMATCH = 1;
 
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        Query nonAdminQuery = new Query();
+        nonAdminQuery.addCriteria(
+                new Criteria().orOperator(
+                        Criteria.where("isAdmin").isNull(),
+                        Criteria.where("isAdmin").is(0)
+                )
+        );
+        return mongoTemplate.find(nonAdminQuery, Student.class);
     }
 
     public boolean validation(String username, String password) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("userName").is(username).andOperator(
+        query.addCriteria(new Criteria().andOperator(
+                Criteria.where("userName").is(username),
                 Criteria.where("password").is(password)
         ));
 
@@ -82,6 +90,9 @@ public class MatchService {
             return false;
         }
 
+        if(student.getIsAdmin() == null){
+            student.setIsAdmin(0);
+        }
         studentRepository.insert(student);
         return true;
     }
@@ -90,12 +101,28 @@ public class MatchService {
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(userName));
         List<Student> students = mongoTemplate.find(query, Student.class);
+
         if(students == null) {
             return false;
         }
 
-            studentRepository.deleteById(students.get(0).getId());
-            return true;
+        Query deleteMatchQuery = new Query();
+        deleteMatchQuery.addCriteria(new Criteria().orOperator(
+                Criteria.where("userOneId").is(userName),
+                Criteria.where("userTwoId").is(userName)
+        ));
+
+        List<Matches> matchesToDelete = mongoTemplate.find(deleteMatchQuery, Matches.class);
+        if(matchesToDelete != null) {
+            for(int i=0;i<matchesToDelete.size();i++) {
+                System.out.println(matchesToDelete.get(i).getId());
+                matchRepository.deleteById(matchesToDelete.get(i).getId());
+            }
+        }
+
+
+        studentRepository.deleteById(students.get(0).getId());
+        return true;
 
     }
 
