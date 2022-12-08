@@ -22,7 +22,7 @@ public class Student {
     private String lastName;
     private String pronouns;
     private String campus;
-    private Integer year;
+    private String year;
     private String major;
     private String genderPreference;
     private String bio;
