@@ -27,6 +27,8 @@ public class Student {
     private String genderPreference;
     private String bio;
 
+    private String contactInfo;
+
    // private ArrayList<String> courses;
     private List<String> course;
 
