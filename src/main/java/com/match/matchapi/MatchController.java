@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import java.util.List;
 
@@ -111,15 +109,22 @@ public class MatchController {
     @GetMapping(path = "findRequests/{userName}")
     @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
     @ResponseBody
-    public List<String> findRequests(@PathVariable String userName){
+    public List<Student> findRequests(@PathVariable String userName){
         return matchService.findRequests(userName);
     }
 
     @GetMapping(path = "findConfirmedMatches/{userName}")
     @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
     @ResponseBody
-    public List<String> findConfirmedMatches(@PathVariable String userName){
+    public List<Student> findConfirmedMatches(@PathVariable String userName){
         return matchService.findConfirmedMatches(userName);
+    }
+
+    @GetMapping(path = "findRequestsSent/{userName}")
+    @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
+    @ResponseBody
+    public List<Student> findRequestsSent(@PathVariable String userName){
+        return matchService.findRequestsSent(userName);
     }
 
     @Transactional
@@ -166,11 +171,10 @@ public class MatchController {
     }
 
     @Transactional
-    @DeleteMapping(path = "/deleteMatch/{userName}")
+    @DeleteMapping(path = "/deleteMatch/{matchId}")
     @CrossOrigin(origins={"http://localhost:3000", "https://match-swensational.netlify.app"})
-    public  ResponseEntity deleteMatch(@PathVariable String userName){
-        System.out.println(userName);
-        if (matchService.deleteMatch(userName)){
+    public  ResponseEntity deleteMatch(@PathVariable String matchId){
+        if (matchService.deleteMatch(matchId)){
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

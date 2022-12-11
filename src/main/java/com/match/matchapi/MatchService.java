@@ -40,6 +40,7 @@ public class MatchService {
 
     private static int ALERTREQUEST = 0;
     private static int ALERTMATCH = 1;
+    private static int ALERTREQUESTSENT = 2;
 
     public List<Student> getAllStudents() {
         Query nonAdminQuery = new Query();
@@ -102,7 +103,7 @@ public class MatchService {
         query.addCriteria(Criteria.where("userName").is(userName));
         List<Student> students = mongoTemplate.find(query, Student.class);
 
-        if(students == null) {
+        if(students == null || students.size() == 0) {
             return false;
         }
 
@@ -119,7 +120,6 @@ public class MatchService {
                 matchRepository.deleteById(matchesToDelete.get(i).getId());
             }
         }
-
 
         studentRepository.deleteById(students.get(0).getId());
         return true;
@@ -299,7 +299,41 @@ public class MatchService {
             return null;
         }
         //list of all students
-        List<Student> allStudents = getAllStudents();
+
+        Query query = new Query();
+        query.addCriteria(new Criteria().orOperator(
+                Criteria.where("admin").isNull(),
+                Criteria.where("admin").is(0)
+        ));
+
+        List<Student> allStudents = mongoTemplate.find(query, Student.class);
+
+        List<Student> studentBuddies = findConfirmedMatches(userName);
+        List<Student> studentsAlreadyRequested = findRequestsSent(userName);
+
+        List<Student> filteredStudents = new ArrayList<>();
+
+        int breakIndicator = 0;
+        for(int i = 0; i < allStudents.size(); i++){
+            breakIndicator = 0;
+            for(int j = 0; j < studentBuddies.size(); j++){
+                if(allStudents.get(i).getUserName().equals(studentBuddies.get(j).getUserName())){
+                    breakIndicator = 1;
+                    break;
+                }
+            }
+            for(int j = 0; j < studentsAlreadyRequested.size(); j++){
+                if(allStudents.get(i).getUserName().equals(studentsAlreadyRequested.get(j).getUserName())){
+                    breakIndicator = 1;
+                    break;
+                }
+            }
+            if(breakIndicator == 0){
+                filteredStudents.add(allStudents.get(i));
+            }
+        }
+
+        allStudents = filteredStudents;
 
         //points array
         List<Integer> points = new ArrayList<>();
@@ -378,12 +412,12 @@ public class MatchService {
         return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
     }
 
-    public boolean deleteMatch(String userName){
-        System.out.println(userName);
+    public boolean deleteMatch(String matchId){
+        System.out.println(matchId);
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(userName));
+        query.addCriteria(Criteria.where("id").is(matchId));
         List<Matches> matches = mongoTemplate.find(query, Matches.class);
-        if(matches == null) {
+        if(matches == null || matches.size() == 0) {
             return false;
         }
         matchRepository.deleteById(matches.get(0).getId());
@@ -396,7 +430,7 @@ public class MatchService {
 //    }
 
 
-    public List<String> alertsHelper(String userName, int indicator) {
+    public List<Student> alertsHelper(String userName, int indicator) {
         if(!studentExists(userName)){
             return null;
         }
@@ -411,12 +445,12 @@ public class MatchService {
 
         List<Matches> requestsSent = mongoTemplate.find(querySent, Matches.class);
 
-        List<String> buddies = new ArrayList<>();
+        List<Student> buddies = new ArrayList<>();
 
         for(int i = 0; i<requestsSent.size(); i++){
             for(int j = 0; j<requestsReceived.size(); j++){
                 if(requestsReceived.get(j).getUserOneId().equals(requestsSent.get(i).getUserTwoId())){
-                    buddies.add(requestsReceived.get(j).getUserOneId());
+                    buddies.add(getStudent(requestsReceived.get(j).getUserOneId()));
                     break;
                 }
             }
@@ -426,22 +460,43 @@ public class MatchService {
             return buddies;
         }
 
-        List<String> requests = new ArrayList<>();
+        List<Matches> requestList;
 
-        for(int i = 0; i<requestsReceived.size(); i++){
-            if(!buddies.contains(requestsReceived.get(i).getUserOneId())){
-                requests.add(requestsReceived.get(i).getUserOneId());
+        if(indicator == ALERTREQUESTSENT){
+            requestList = requestsSent;
+        }
+        else{
+            requestList = requestsReceived;
+        }
+
+        List<Student> requests = new ArrayList<>();
+        int breakIndicator = 0;
+        for(int i = 0; i<requestList.size(); i++){
+            breakIndicator = 0;
+            for(int j = 0; j<buddies.size(); j++){
+                if(buddies.get(j).getUserName().equals(requestList.get(i).getUserOneId())){
+                    breakIndicator = 1;
+                    break;
+                }
             }
+            if(breakIndicator == 1){
+                continue;
+            }
+            requests.add(getStudent(requestList.get(i).getUserOneId()));
         }
         return requests;
     }
 
-    public List<String> findRequests(String username){
+    public List<Student> findRequests(String username){
         return alertsHelper(username, ALERTREQUEST);
     }
 
-    public List<String> findConfirmedMatches(String username){
+    public List<Student> findConfirmedMatches(String username){
         return alertsHelper(username, ALERTMATCH);
+    }
+
+    public List<Student> findRequestsSent(String username){
+        return alertsHelper(username, ALERTREQUESTSENT);
     }
 
     public boolean addCourse(Course course) {
@@ -468,7 +523,7 @@ public class MatchService {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(id));
         List<Course> courses = mongoTemplate.find(query, Course.class);
-        if(courses == null) {
+        if(courses == null || courses.size() == 0) {
             return false;
         }
 
