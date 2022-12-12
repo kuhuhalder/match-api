@@ -5,11 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Service layer for our web app, contains all methods
+ * for the API's
+ *
+ * @author Prince Rawal
+ * @author Farah Lubaba Rouf
+ */
 
 @Service
 @AllArgsConstructor
@@ -27,6 +34,10 @@ public class MatchService {
     @Autowired
     private final MongoTemplate mongoTemplate;
 
+    /**
+     * Constants for sending and receiving match requests
+     */
+
     private static int BADREQUEST = -1;
     private static int REQUESTSENT = 0;
     private static int REQUESTSENTANDMATCHED = 1;
@@ -42,6 +53,12 @@ public class MatchService {
     private static int ALERTMATCH = 1;
     private static int ALERTREQUESTSENT = 2;
 
+    /**
+     * Gets list of all students in database
+     *
+     * @return list of all students, excluding admin
+     */
+
     public List<Student> getAllStudents() {
         Query nonAdminQuery = new Query();
         nonAdminQuery.addCriteria(
@@ -52,6 +69,14 @@ public class MatchService {
         );
         return mongoTemplate.find(nonAdminQuery, Student.class);
     }
+
+    /**
+     * Checks that a student exists in the database
+     *
+     * @param username is username of student
+     * @param password is account password
+     * @return true if account exists, false otherwise
+     */
 
     public boolean validation(String username, String password) {
         Query query = new Query();
@@ -69,6 +94,13 @@ public class MatchService {
         return students.size()==1;
     }
 
+    /**
+     * Checks that student exists given only username
+     *
+     * @param username is student's username
+     * @return true if account exists, false otherwise
+     */
+
     public boolean studentExists(String username){
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(username));
@@ -81,6 +113,13 @@ public class MatchService {
 
         return true;
     }
+
+    /**
+     * Given student object, adds a student to the database
+     *
+     * @param student is a Student object with all the info
+     * @return true if student doesn't exist and is added, false otherwise
+     */
 
     public boolean addStudent(Student student) {
         Query query = new Query();
@@ -97,6 +136,15 @@ public class MatchService {
         studentRepository.insert(student);
         return true;
     }
+
+    /**
+     * Deletes a student from the databasem, deletes all matches
+     * of the student as well
+     *
+     * @param userName is student username
+     * @return true if student exists and is able to be deleted,
+     * false otherwise
+     */
 
     public boolean deleteStudent(String userName) {
         Query query = new Query();
@@ -116,7 +164,6 @@ public class MatchService {
         List<Matches> matchesToDelete = mongoTemplate.find(deleteMatchQuery, Matches.class);
         if(matchesToDelete != null) {
             for(int i=0;i<matchesToDelete.size();i++) {
-                System.out.println(matchesToDelete.get(i).getId());
                 matchRepository.deleteById(matchesToDelete.get(i).getId());
             }
         }
@@ -126,9 +173,23 @@ public class MatchService {
 
     }
 
+    /**
+     * Given a username finds a student in the database
+     *
+     * @param userName is student username
+     * @return matching student object
+     */
+
     public Student getStudent(String userName) {
         return mongoTemplate.findById(userName, Student.class);
     }
+
+    /**
+     * Updates student object in database
+     *
+     * @param student is student object
+     * @return true if student is updated, false if it doesn't exist
+     */
 
     public boolean updateStudent(Student student) {
         Query query = new Query();
@@ -178,6 +239,13 @@ public class MatchService {
 
     }
 
+    /**
+     * Helper method for mergesorting the points for similarity index
+     *
+     * @param points is the points each student has
+     * @param students is the list of all students
+     */
+
     private void merge(List<Integer> points,List<Student> students,int l,int m, int r) {
 
 
@@ -216,7 +284,6 @@ public class MatchService {
             }
         }
 
-        //jhjghj
         /* Copy remaining elements of L[] if any */
         while (i <= m) {
             points.set(k, Lpoints[i-l]);
@@ -233,6 +300,14 @@ public class MatchService {
             k++;
         }
     }
+
+    /**
+     * Helper method for mergesorting the points for similarity index
+     *
+     * @param points is the points each student has
+     * @param students is the list of all students
+     */
+
     void sort(List<Integer> points,List<Student> students, int l, int r)
     {
         if(r <= l){
@@ -250,6 +325,16 @@ public class MatchService {
             merge(points, students, l, m, r);
         }
     }
+
+    /**
+     * Our main business logic, which returns a list of best matches for the
+     * student in descending order. Points are given based on course,campus,
+     * gender preference, and major
+     *
+     * @param student1 is the student we are finding matches for
+     * @param student2 is the student we are comparing to and giving points to
+     * @return points for each student
+     */
 
     private Integer similarityIndex(Student student1, Student student2) {
         int points = 0;
@@ -291,6 +376,16 @@ public class MatchService {
         return points;
 
     }
+
+    /**
+     * Applies similarity index algorithm on all the students
+     * to display the list of potential matches in
+     * descending order of points
+     *
+     * @param userName is the user of the student we are finding
+     *         matches for
+     * @return list of students in descending order
+     */
 
     public List<Student> findBuddies(String userName) {
 
@@ -354,6 +449,14 @@ public class MatchService {
         return allStudents;
     }
 
+    /**
+     * Checks that match exists between 2 students
+     *
+     * @param userName1,username2 the users of the 2 students
+     * @return constant based on who requested whom or if there were
+     * no requests sent
+     */
+
 
     public int matchExists(String userName1, String userName2) {
         Query query1 = new Query();
@@ -381,6 +484,14 @@ public class MatchService {
 
         return NOUSERREQUESTED;
     }
+
+    /**
+     * Adds a match to the database
+     *
+     * @param match is the match to be added to the database
+     * @return an integer based on whether it's a valid match
+     * or not
+     */
 
     public int addMatches(Matches match) {
 
@@ -412,6 +523,13 @@ public class MatchService {
         return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
     }
 
+    /**
+     * Deletes a match from the database
+     *
+     * @param matchId is the match id to be deleted
+     * @return true or false depending on whether match can be deleted
+     */
+
     public boolean deleteMatch(String matchId){
         System.out.println(matchId);
         Query query = new Query();
@@ -425,9 +543,16 @@ public class MatchService {
 
     }
 
-//    public static List<Matches> viewAllStudyBuddies(){
-//        MatchRepository.findAll();
-//    }
+
+    /**
+     * If two users sent match requests to each other, makes them
+     * study buddies and retuns euther the confirmed (matched)
+     * buddies or the requests sent
+     *
+     * @param userName is the student user
+     * @return list of students who have matched with user or
+     * sent them a request
+     */
 
 
     public List<Student> alertsHelper(String userName, int indicator) {
@@ -487,17 +612,48 @@ public class MatchService {
         return requests;
     }
 
+    /**
+     * Find the requests the student has received
+     *
+     * @param username is the user of the student
+     * @return list of students who have sent requests to user
+     */
+
     public List<Student> findRequests(String username){
         return alertsHelper(username, ALERTREQUEST);
     }
+
+    /**
+     * Find the study buddies for the students (if both
+     * have sent matches to each other)
+     *
+     * @param username is the user of the student
+     * @return list of students who are study buddies with
+     * the student
+     */
 
     public List<Student> findConfirmedMatches(String username){
         return alertsHelper(username, ALERTMATCH);
     }
 
+    /**
+     * Find the requests student has sent
+     *
+     * @param username is the user of the student
+     * @return list of students who the user sent requests to
+     */
+
     public List<Student> findRequestsSent(String username){
         return alertsHelper(username, ALERTREQUESTSENT);
     }
+
+    /**
+     * Allows admin to add a course to the database
+     *
+     * @param course is the course to be added
+     * @return true if course is able to be added,
+     * false otherwise
+     */
 
     public boolean addCourse(Course course) {
         Query query = new Query();
@@ -511,13 +667,34 @@ public class MatchService {
         return true;
     }
 
+    /**
+     * Gets all courses from course repository
+     *
+     *
+     * @return list of all courses
+     */
+
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
     }
 
+    /**
+     * Gets course by id
+     *
+     * @param id of course
+     * @return the course
+     */
+
     public Course getCourseById(String id) {
         return mongoTemplate.findById(id, Course.class);
     }
+
+    /**
+     * Deletes courses from course repository
+     *
+     * @param id of course to be deleted
+     *
+     */
 
     public boolean deleteCourse(String id) {
         Query query = new Query();
@@ -531,6 +708,13 @@ public class MatchService {
         return true;
 
     }
+
+    /**
+     * Gets all confirmed matches for admin
+     *
+     *
+     * @return list of all confirmed matches
+     */
 
     public List<Matches> getAllConfirmedMatches() {
         List<Matches> allMatches = matchRepository.findAll();
