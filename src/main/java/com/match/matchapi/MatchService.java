@@ -588,31 +588,46 @@ public class MatchService {
             return buddies;
         }
 
-        List<Matches> requestList;
+        List<Student> requests = new ArrayList<>();
 
         if(indicator == ALERTREQUESTSENT){
-            requestList = requestsSent;
+
+            int breakIndicator = 0;
+            for(int i = 0; i<requestsSent.size(); i++){
+                breakIndicator = 0;
+                for(int j = 0; j<buddies.size(); j++){
+                    if(buddies.get(j).getUserName().equals(requestsSent.get(i).getUserTwoId())){
+                        breakIndicator = 1;
+                        break;
+                    }
+                }
+                if(breakIndicator == 1){
+                    continue;
+                }
+                requests.add(getStudent(requestsSent.get(i).getUserTwoId()));
+            }
+            return requests;
         }
         else{
-            requestList = requestsReceived;
+
+            int breakIndicator = 0;
+            for(int i = 0; i<requestsReceived.size(); i++){
+                breakIndicator = 0;
+                for(int j = 0; j<buddies.size(); j++){
+                    if(buddies.get(j).getUserName().equals(requestsReceived.get(i).getUserOneId())){
+                        breakIndicator = 1;
+                        break;
+                    }
+                }
+                if(breakIndicator == 1){
+                    continue;
+                }
+                requests.add(getStudent(requestsReceived.get(i).getUserOneId()));
+            }
+            return requests;
         }
 
-        List<Student> requests = new ArrayList<>();
-        int breakIndicator = 0;
-        for(int i = 0; i<requestList.size(); i++){
-            breakIndicator = 0;
-            for(int j = 0; j<buddies.size(); j++){
-                if(buddies.get(j).getUserName().equals(requestList.get(i).getUserOneId())){
-                    breakIndicator = 1;
-                    break;
-                }
-            }
-            if(breakIndicator == 1){
-                continue;
-            }
-            requests.add(getStudent(requestList.get(i).getUserOneId()));
-        }
-        return requests;
+
     }
 
     /**
