@@ -232,6 +232,9 @@ public class MatchService {
         if(student.getGenderPreference() == null){
             student.setGenderPreference(students.get(0).getGenderPreference());
         }
+        if(student.getContactInfo() == null){
+            student.setContactInfo(students.get(0).getContactInfo());
+        }
 
         studentRepository.deleteById(student.getId());
         studentRepository.insert(student);
@@ -736,6 +739,25 @@ public class MatchService {
         return confirmedMatches;
     }
 
+//    public boolean updateCourse(Course course)
+//    {
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("id").is(course.getId()));
+//        List<Course> courses = mongoTemplate.find(query, Course.class);
+//        if (courses == null || courses.size() <= 0)
+//        {
+//            return false;
+//        }
+//        if(course.getCourseName() == null){
+//            course.setCourseName(courses.get(0).getCourseName());
+//        }
+//
+////        courses.de(course.getId());
+////        studentRepository.insert(course);
+////        return true;
+//
+//
+//    }
 
 
 
