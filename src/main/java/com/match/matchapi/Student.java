@@ -1,12 +1,19 @@
 package com.match.matchapi;
 
 import lombok.Data;
-import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+
+/**
+ * An instance of this class is a new Student
+ * in the database.
+ *
+ * @author Prince Rawal
+ * @author Farah Lubaba Rouf
+ */
 
 
 @Data

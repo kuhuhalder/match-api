@@ -9,6 +9,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document
 
+/**
+ * An instance of this class is a new Course
+ * in the database.
+ *
+ * @author Prince Rawal
+ * @author Farah Lubaba Rouf
+ */
+
 public class Course {
     @Id
     private String id;
