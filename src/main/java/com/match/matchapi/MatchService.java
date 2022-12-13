@@ -20,38 +20,33 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class MatchService {
-
-    @Autowired
-    private final StudentRepository studentRepository;
-
-    @Autowired
-    private final CourseRepository courseRepository;
-
-    @Autowired
-    private final MatchRepository matchRepository;
-
-    @Autowired
-    private final MongoTemplate mongoTemplate;
+public class MatchService
+{
 
     /**
      * Constants for sending and receiving match requests
      */
 
-    private static int BADREQUEST = -1;
-    private static int REQUESTSENT = 0;
-    private static int REQUESTSENTANDMATCHED = 1;
-    private static int REQUESTEXISTS = 2;
-    private static int ALREADYMATCHED = 3;
-
-    private static int NOUSERREQUESTED = -1;
-    private static int USER1REQUESTEDUSER2 = 0;
-    private static int USER2REQUESTEDUSER1 = 1;
-    private static int MATCHED = 2;
-
-    private static int ALERTREQUEST = 0;
-    private static int ALERTMATCH = 1;
-    private static int ALERTREQUESTSENT = 2;
+    private static final int BADREQUEST = -1;
+    private static final int REQUESTSENT = 0;
+    private static final int REQUESTSENTANDMATCHED = 1;
+    private static final int REQUESTEXISTS = 2;
+    private static final int ALREADYMATCHED = 3;
+    private static final int NOUSERREQUESTED = -1;
+    private static final int USER1REQUESTEDUSER2 = 0;
+    private static final int USER2REQUESTEDUSER1 = 1;
+    private static final int MATCHED = 2;
+    private static final int ALERTREQUEST = 0;
+    private static final int ALERTMATCH = 1;
+    private static final int ALERTREQUESTSENT = 2;
+    @Autowired
+    private final StudentRepository studentRepository;
+    @Autowired
+    private final CourseRepository courseRepository;
+    @Autowired
+    private final MatchRepository matchRepository;
+    @Autowired
+    private final MongoTemplate mongoTemplate;
 
     /**
      * Gets list of all students in database
@@ -59,7 +54,8 @@ public class MatchService {
      * @return list of all students, excluding admin
      */
 
-    public List<Student> getAllStudents() {
+    public List<Student> getAllStudents()
+    {
         Query nonAdminQuery = new Query();
         nonAdminQuery.addCriteria(
                 new Criteria().orOperator(
@@ -78,7 +74,8 @@ public class MatchService {
      * @return true if account exists, false otherwise
      */
 
-    public boolean validation(String username, String password) {
+    public boolean validation(String username, String password)
+    {
         Query query = new Query();
         query.addCriteria(new Criteria().andOperator(
                 Criteria.where("userName").is(username),
@@ -87,11 +84,12 @@ public class MatchService {
 
         List<Student> students = mongoTemplate.find(query, Student.class);
 
-        if (students.isEmpty()){
+        if (students.isEmpty())
+        {
             return false;
         }
 
-        return students.size()==1;
+        return students.size() == 1;
     }
 
     /**
@@ -101,17 +99,14 @@ public class MatchService {
      * @return true if account exists, false otherwise
      */
 
-    public boolean studentExists(String username){
+    public boolean studentExists(String username)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(username));
 
         List<Student> students = mongoTemplate.find(query, Student.class);
 
-        if((students == null) || (students.size() != 1)){
-            return false;
-        }
-
-        return true;
+        return (students != null) && (students.size() == 1);
     }
 
     /**
@@ -121,16 +116,19 @@ public class MatchService {
      * @return true if student doesn't exist and is added, false otherwise
      */
 
-    public boolean addStudent(Student student) {
+    public boolean addStudent(Student student)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(student.getUserName()));
         List<Student> students = mongoTemplate.find(query, Student.class);
 
-        if (students.size() > 0){
+        if (students.size() > 0)
+        {
             return false;
         }
 
-        if(student.getIsAdmin() == null){
+        if (student.getIsAdmin() == null)
+        {
             student.setIsAdmin(0);
         }
         studentRepository.insert(student);
@@ -146,12 +144,14 @@ public class MatchService {
      * false otherwise
      */
 
-    public boolean deleteStudent(String userName) {
+    public boolean deleteStudent(String userName)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("userName").is(userName));
         List<Student> students = mongoTemplate.find(query, Student.class);
 
-        if(students == null || students.size() == 0) {
+        if (students == null || students.size() == 0)
+        {
             return false;
         }
 
@@ -162,8 +162,10 @@ public class MatchService {
         ));
 
         List<Matches> matchesToDelete = mongoTemplate.find(deleteMatchQuery, Matches.class);
-        if(matchesToDelete != null) {
-            for(int i=0;i<matchesToDelete.size();i++) {
+        if (matchesToDelete != null)
+        {
+            for (int i = 0; i < matchesToDelete.size(); i++)
+            {
                 matchRepository.deleteById(matchesToDelete.get(i).getId());
             }
         }
@@ -180,7 +182,8 @@ public class MatchService {
      * @return matching student object
      */
 
-    public Student getStudent(String userName) {
+    public Student getStudent(String userName)
+    {
         return mongoTemplate.findById(userName, Student.class);
     }
 
@@ -191,48 +194,61 @@ public class MatchService {
      * @return true if student is updated, false if it doesn't exist
      */
 
-    public boolean updateStudent(Student student) {
+    public boolean updateStudent(Student student)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(student.getId()));
         List<Student> students = mongoTemplate.find(query, Student.class);
-        if(students == null || students.size()<=0){
+        if (students == null || students.size() <= 0)
+        {
             return false;
         }
 
         student.setUserName(students.get(0).getUserName());
 
-        if(student.getCourse() == null){
+        if (student.getCourse() == null)
+        {
             student.setCourse(students.get(0).getCourse());
         }
 
-        if(student.getCampus() == null){
+        if (student.getCampus() == null)
+        {
             student.setCampus(students.get(0).getCampus());
         }
-        if(student.getFirstName() == null){
+        if (student.getFirstName() == null)
+        {
             student.setFirstName(students.get(0).getFirstName());
         }
-        if(student.getLastName() == null){
+        if (student.getLastName() == null)
+        {
             student.setLastName(students.get(0).getLastName());
         }
-        if(student.getBio() == null){
+        if (student.getBio() == null)
+        {
             student.setBio(students.get(0).getBio());
         }
-        if(student.getMajor() == null){
+        if (student.getMajor() == null)
+        {
             student.setMajor(students.get(0).getMajor());
         }
-        if(student.getPronouns() == null){
+        if (student.getPronouns() == null)
+        {
             student.setPronouns(students.get(0).getPronouns());
         }
-        if(student.getPassword() == null){
+        if (student.getPassword() == null)
+        {
             student.setPassword(students.get(0).getPassword());
         }
-        if(student.getYear() == null){
+        if (student.getYear() == null)
+        {
             student.setYear(students.get(0).getYear());
         }
-        if(student.getGenderPreference() == null){
+        if (student.getGenderPreference() == null)
+        {
             student.setGenderPreference(students.get(0).getGenderPreference());
         }
-        if(student.getContactInfo() == null){
+        if (student.getContactInfo() == null)
+        {
             student.setContactInfo(students.get(0).getContactInfo());
         }
 
@@ -245,60 +261,68 @@ public class MatchService {
     /**
      * Helper method for mergesorting the points for similarity index
      *
-     * @param points is the points each student has
+     * @param points   is the points each student has
      * @param students is the list of all students
      */
 
-    private void merge(List<Integer> points,List<Student> students,int l,int m, int r) {
+    private void merge(List<Integer> points, List<Student> students, int l, int m, int r)
+    {
 
 
         /* Create temp arrays */
-        int Lpoints[] = new int[m - l + 3];
-        int Rpoints[] = new int[r - m + 3];
+        int[] Lpoints = new int[m - l + 3];
+        int[] Rpoints = new int[r - m + 3];
 
-        Student Lstudents[] = new Student[m - l + 3];
-        Student Rstudents[] = new Student[r - m + 3];
+        Student[] Lstudents = new Student[m - l + 3];
+        Student[] Rstudents = new Student[r - m + 3];
 
         /*Copy data to temp arrays*/
-        for (int i = l; i <= m; i++) {
+        for (int i = l; i <= m; i++)
+        {
             Lpoints[i - l] = points.get(i);
             Lstudents[i - l] = students.get(i);
         }
-        for (int j = m+1; j <= r; j++) {
+        for (int j = m + 1; j <= r; j++)
+        {
             Rpoints[j - (m + 1)] = points.get(j);
             Rstudents[j - (m + 1)] = students.get(j);
         }
 
-        int i = l, j = m+1;
+        int i = l, j = m + 1;
 
         int k = l;
-        while (i <= m && j <= r) {
-            if (Lpoints[i-l] >= Rpoints[j-(m+1)]) {
-                points.set(k, Lpoints[i-l]);
-                students.set(k,Lstudents[i-l]);
+        while (i <= m && j <= r)
+        {
+            if (Lpoints[i - l] >= Rpoints[j - (m + 1)])
+            {
+                points.set(k, Lpoints[i - l]);
+                students.set(k, Lstudents[i - l]);
                 i++;
                 k++;
             }
-            else {
-                points.set(k, Rpoints[j-(m+1)]);
-                students.set(k, Rstudents[j-(m+1)]);
+            else
+            {
+                points.set(k, Rpoints[j - (m + 1)]);
+                students.set(k, Rstudents[j - (m + 1)]);
                 j++;
                 k++;
             }
         }
 
         /* Copy remaining elements of L[] if any */
-        while (i <= m) {
-            points.set(k, Lpoints[i-l]);
-            students.set(k,Lstudents[i-l]);
+        while (i <= m)
+        {
+            points.set(k, Lpoints[i - l]);
+            students.set(k, Lstudents[i - l]);
             i++;
             k++;
         }
 
         /* Copy remaining elements of R[] if any */
-        while (j <= l) {
-            points.set(k,Rpoints[j-(m+1)]);
-            students.set(k,Rstudents[j-(m+1)]);
+        while (j <= l)
+        {
+            points.set(k, Rpoints[j - (m + 1)]);
+            students.set(k, Rstudents[j - (m + 1)]);
             j++;
             k++;
         }
@@ -307,22 +331,24 @@ public class MatchService {
     /**
      * Helper method for mergesorting the points for similarity index
      *
-     * @param points is the points each student has
+     * @param points   is the points each student has
      * @param students is the list of all students
      */
 
-    void sort(List<Integer> points,List<Student> students, int l, int r)
+    void sort(List<Integer> points, List<Student> students, int l, int r)
     {
-        if(r <= l){
+        if (r <= l)
+        {
             return;
         }
-        if (l < r) {
+        if (l < r)
+        {
             // Find the middle point
             int m = (r + l) / 2;
 
             // Sort first and second halves
-            sort(points,students, l, m);
-            sort(points,students, m + 1, r);
+            sort(points, students, l, m);
+            sort(points, students, m + 1, r);
 
             // Merge the sorted halves
             merge(points, students, l, m, r);
@@ -339,37 +365,50 @@ public class MatchService {
      * @return points for each student
      */
 
-    private Integer similarityIndex(Student student1, Student student2) {
+    private Integer similarityIndex(Student student1, Student student2)
+    {
         int points = 0;
-        if(student1.getMajor()!=null && student2.getMajor()!=null) {
-            if (student1.getMajor().equals(student2.getMajor())) {
+        if (student1.getMajor() != null && student2.getMajor() != null)
+        {
+            if (student1.getMajor().equals(student2.getMajor()))
+            {
                 points += 2;
             }
         }
 
-        if(student1.getYear()!=null && student2.getYear()!=null) {
-            if (student1.getYear().equals(student2.getYear())) {
+        if (student1.getYear() != null && student2.getYear() != null)
+        {
+            if (student1.getYear().equals(student2.getYear()))
+            {
                 points += 1;
             }
         }
 
-        if(student1.getCampus()!=null && student2.getCampus()!=null) {
-            if (student1.getCampus().equals(student2.getCampus())) {
+        if (student1.getCampus() != null && student2.getCampus() != null)
+        {
+            if (student1.getCampus().equals(student2.getCampus()))
+            {
                 points += 2;
             }
         }
 
-        if(student1.getGenderPreference()!=null && student2.getGenderPreference()!=null) {
-            if (student1.getGenderPreference().equals(student2.getGenderPreference())) {
+        if (student1.getGenderPreference() != null && student2.getGenderPreference() != null)
+        {
+            if (student1.getGenderPreference().equals(student2.getGenderPreference()))
+            {
                 points += 2;
             }
         }
 
-        if(student1.getCourse()!=null && student2.getCourse()!=null) {
-            for(int i=0;i<student1.getCourse().size();i++)  {
-                for(int j=0;j<student2.getCourse().size();j++) {
-                    if(student1.getCourse().get(i).equals(student2.getCourse().get(j))) {
-                        points+=3;
+        if (student1.getCourse() != null && student2.getCourse() != null)
+        {
+            for (int i = 0; i < student1.getCourse().size(); i++)
+            {
+                for (int j = 0; j < student2.getCourse().size(); j++)
+                {
+                    if (student1.getCourse().get(i).equals(student2.getCourse().get(j)))
+                    {
+                        points += 3;
                         break;
                     }
                 }
@@ -386,14 +425,16 @@ public class MatchService {
      * descending order of points
      *
      * @param userName is the user of the student we are finding
-     *         matches for
+     *                 matches for
      * @return list of students in descending order
      */
 
-    public List<Student> findBuddies(String userName) {
+    public List<Student> findBuddies(String userName)
+    {
 
         Student student = getStudent(userName);
-        if(student==null) {
+        if (student == null)
+        {
             return null;
         }
         //list of all students
@@ -412,21 +453,27 @@ public class MatchService {
         List<Student> filteredStudents = new ArrayList<>();
 
         int breakIndicator = 0;
-        for(int i = 0; i < allStudents.size(); i++){
+        for (int i = 0; i < allStudents.size(); i++)
+        {
             breakIndicator = 0;
-            for(int j = 0; j < studentBuddies.size(); j++){
-                if(allStudents.get(i).getUserName().equals(studentBuddies.get(j).getUserName())){
+            for (int j = 0; j < studentBuddies.size(); j++)
+            {
+                if (allStudents.get(i).getUserName().equals(studentBuddies.get(j).getUserName()))
+                {
                     breakIndicator = 1;
                     break;
                 }
             }
-            for(int j = 0; j < studentsAlreadyRequested.size(); j++){
-                if(allStudents.get(i).getUserName().equals(studentsAlreadyRequested.get(j).getUserName())){
+            for (int j = 0; j < studentsAlreadyRequested.size(); j++)
+            {
+                if (allStudents.get(i).getUserName().equals(studentsAlreadyRequested.get(j).getUserName()))
+                {
                     breakIndicator = 1;
                     break;
                 }
             }
-            if(breakIndicator == 0){
+            if (breakIndicator == 0)
+            {
                 filteredStudents.add(allStudents.get(i));
             }
         }
@@ -436,18 +483,21 @@ public class MatchService {
         //points array
         List<Integer> points = new ArrayList<>();
 
-        for(int i=0;i<allStudents.size();i++) {
-            if(allStudents.get(i).getUserName().equals(student.getUserName())) {
+        for (int i = 0; i < allStudents.size(); i++)
+        {
+            if (allStudents.get(i).getUserName().equals(student.getUserName()))
+            {
                 allStudents.remove(i);
                 break;
             }
         }
 
-        for(int i = 0; i < allStudents.size(); i++){
+        for (int i = 0; i < allStudents.size(); i++)
+        {
             points.add(similarityIndex(student, allStudents.get(i)));
         }
 
-        sort(points,allStudents,0,allStudents.size()-1);
+        sort(points, allStudents, 0, allStudents.size() - 1);
 
         return allStudents;
     }
@@ -461,27 +511,31 @@ public class MatchService {
      */
 
 
-    public int matchExists(String userName1, String userName2) {
+    public int matchExists(String userName1, String userName2)
+    {
         Query query1 = new Query();
         query1.addCriteria(Criteria.where("id").is(userName1 + "+" + userName2));
 
         List<Matches> matches1 = mongoTemplate.find(query1, Matches.class);
 
         Query query2 = new Query();
-        query2.addCriteria(Criteria.where("id").is(userName2+ "+" + userName1));
+        query2.addCriteria(Criteria.where("id").is(userName2 + "+" + userName1));
 
         List<Matches> matches2 = mongoTemplate.find(query2, Matches.class);
 
-        if((matches1 != null) && (matches2 != null) &&
-                (matches1.size()>0) && (matches2.size()>0)){
+        if ((matches1 != null) && (matches2 != null) &&
+                (matches1.size() > 0) && (matches2.size() > 0))
+        {
             return MATCHED;
         }
 
-        if((matches1 != null) && (matches1.size()>0)){
+        if ((matches1 != null) && (matches1.size() > 0))
+        {
             return USER1REQUESTEDUSER2;
         }
 
-        if((matches1 != null) && (matches1.size()>0)){
+        if ((matches1 != null) && (matches1.size() > 0))
+        {
             return USER2REQUESTEDUSER1;
         }
 
@@ -496,34 +550,39 @@ public class MatchService {
      * or not
      */
 
-    public int addMatches(Matches match) {
+    public int addMatches(Matches match)
+    {
 
-        if(match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null){
+        if (match.getId() == null || match.getUserOneId() == null || match.getUserTwoId() == null)
+        {
             return BADREQUEST;
         }
 
-        if(!match.getId().equals(match.getUserOneId() + "+" + match.getUserTwoId())){
+        if (!match.getId().equals(match.getUserOneId() + "+" + match.getUserTwoId()))
+        {
             return BADREQUEST;
         }
 
 
-
-        if(!(studentExists(match.getUserOneId()) && studentExists(match.getUserTwoId()))){
+        if (!(studentExists(match.getUserOneId()) && studentExists(match.getUserTwoId())))
+        {
             return BADREQUEST;
         }
 
         int matchExistsVar = matchExists(match.getUserOneId(), match.getUserTwoId());
 
-        if(matchExistsVar == MATCHED){
+        if (matchExistsVar == MATCHED)
+        {
             return ALREADYMATCHED;
         }
 
-        if(matchExistsVar == USER1REQUESTEDUSER2){
+        if (matchExistsVar == USER1REQUESTEDUSER2)
+        {
             return REQUESTEXISTS;
         }
 
         matchRepository.insert(match);
-        return matchExistsVar == USER2REQUESTEDUSER1? REQUESTSENTANDMATCHED:REQUESTSENT;
+        return matchExistsVar == USER2REQUESTEDUSER1 ? REQUESTSENTANDMATCHED : REQUESTSENT;
     }
 
     /**
@@ -533,12 +592,14 @@ public class MatchService {
      * @return true or false depending on whether match can be deleted
      */
 
-    public boolean deleteMatch(String matchId){
+    public boolean deleteMatch(String matchId)
+    {
         System.out.println(matchId);
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(matchId));
         List<Matches> matches = mongoTemplate.find(query, Matches.class);
-        if(matches == null || matches.size() == 0) {
+        if (matches == null || matches.size() == 0)
+        {
             return false;
         }
         matchRepository.deleteById(matches.get(0).getId());
@@ -558,8 +619,10 @@ public class MatchService {
      */
 
 
-    public List<Student> alertsHelper(String userName, int indicator) {
-        if(!studentExists(userName)){
+    public List<Student> alertsHelper(String userName, int indicator)
+    {
+        if (!studentExists(userName))
+        {
             return null;
         }
 
@@ -575,51 +638,65 @@ public class MatchService {
 
         List<Student> buddies = new ArrayList<>();
 
-        for(int i = 0; i<requestsSent.size(); i++){
-            for(int j = 0; j<requestsReceived.size(); j++){
-                if(requestsReceived.get(j).getUserOneId().equals(requestsSent.get(i).getUserTwoId())){
+        for (int i = 0; i < requestsSent.size(); i++)
+        {
+            for (int j = 0; j < requestsReceived.size(); j++)
+            {
+                if (requestsReceived.get(j).getUserOneId().equals(requestsSent.get(i).getUserTwoId()))
+                {
                     buddies.add(getStudent(requestsReceived.get(j).getUserOneId()));
                     break;
                 }
             }
         }
 
-        if(indicator == ALERTMATCH){
+        if (indicator == ALERTMATCH)
+        {
             return buddies;
         }
 
         List<Student> requests = new ArrayList<>();
 
-        if(indicator == ALERTREQUESTSENT){
+        if (indicator == ALERTREQUESTSENT)
+        {
 
             int breakIndicator = 0;
-            for(int i = 0; i<requestsSent.size(); i++){
+            for (int i = 0; i < requestsSent.size(); i++)
+            {
                 breakIndicator = 0;
-                for(int j = 0; j<buddies.size(); j++){
-                    if(buddies.get(j).getUserName().equals(requestsSent.get(i).getUserTwoId())){
+                for (int j = 0; j < buddies.size(); j++)
+                {
+                    if (buddies.get(j).getUserName().equals(requestsSent.get(i).getUserTwoId()))
+                    {
                         breakIndicator = 1;
                         break;
                     }
                 }
-                if(breakIndicator == 1){
+                if (breakIndicator == 1)
+                {
                     continue;
                 }
                 requests.add(getStudent(requestsSent.get(i).getUserTwoId()));
             }
             return requests;
         }
-        else{
+        else
+        {
 
             int breakIndicator = 0;
-            for(int i = 0; i<requestsReceived.size(); i++){
+            for (int i = 0; i < requestsReceived.size(); i++)
+            {
                 breakIndicator = 0;
-                for(int j = 0; j<buddies.size(); j++){
-                    if(buddies.get(j).getUserName().equals(requestsReceived.get(i).getUserOneId())){
+                for (int j = 0; j < buddies.size(); j++)
+                {
+                    if (buddies.get(j).getUserName().equals(requestsReceived.get(i).getUserOneId()))
+                    {
                         breakIndicator = 1;
                         break;
                     }
                 }
-                if(breakIndicator == 1){
+                if (breakIndicator == 1)
+                {
                     continue;
                 }
                 requests.add(getStudent(requestsReceived.get(i).getUserOneId()));
@@ -637,7 +714,8 @@ public class MatchService {
      * @return list of students who have sent requests to user
      */
 
-    public List<Student> findRequests(String username){
+    public List<Student> findRequests(String username)
+    {
         return alertsHelper(username, ALERTREQUEST);
     }
 
@@ -650,7 +728,8 @@ public class MatchService {
      * the student
      */
 
-    public List<Student> findConfirmedMatches(String username){
+    public List<Student> findConfirmedMatches(String username)
+    {
         return alertsHelper(username, ALERTMATCH);
     }
 
@@ -661,7 +740,8 @@ public class MatchService {
      * @return list of students who the user sent requests to
      */
 
-    public List<Student> findRequestsSent(String username){
+    public List<Student> findRequestsSent(String username)
+    {
         return alertsHelper(username, ALERTREQUESTSENT);
     }
 
@@ -673,12 +753,14 @@ public class MatchService {
      * false otherwise
      */
 
-    public boolean addCourse(Course course) {
+    public boolean addCourse(Course course)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(course.getId()));
         List<Course> courses = mongoTemplate.find(query, Course.class);
 
-        if (courses.size() > 0){
+        if (courses.size() > 0)
+        {
             return false;
         }
         courseRepository.insert(course);
@@ -688,11 +770,11 @@ public class MatchService {
     /**
      * Gets all courses from course repository
      *
-     *
      * @return list of all courses
      */
 
-    public List<Course> getAllCourses() {
+    public List<Course> getAllCourses()
+    {
         return courseRepository.findAll();
     }
 
@@ -703,7 +785,8 @@ public class MatchService {
      * @return the course
      */
 
-    public Course getCourseById(String id) {
+    public Course getCourseById(String id)
+    {
         return mongoTemplate.findById(id, Course.class);
     }
 
@@ -711,14 +794,15 @@ public class MatchService {
      * Deletes courses from course repository
      *
      * @param id of course to be deleted
-     *
      */
 
-    public boolean deleteCourse(String id) {
+    public boolean deleteCourse(String id)
+    {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(id));
         List<Course> courses = mongoTemplate.find(query, Course.class);
-        if(courses == null || courses.size() == 0) {
+        if (courses == null || courses.size() == 0)
+        {
             return false;
         }
 
@@ -730,21 +814,25 @@ public class MatchService {
     /**
      * Gets all confirmed matches for admin
      *
-     *
      * @return list of all confirmed matches
      */
 
-    public List<Matches> getAllConfirmedMatches() {
+    public List<Matches> getAllConfirmedMatches()
+    {
         List<Matches> allMatches = matchRepository.findAll();
         List<Matches> confirmedMatches = new ArrayList<>();
-        int[] indicator = new int [allMatches.size()];
-        for(int i=0;i<allMatches.size();i++){
-            if(indicator[i]!=1) {
-                for (int j = i + 1; j < allMatches.size(); j++) {
-                    if(allMatches.get(i).getUserOneId().equals(allMatches.get(j).getUserTwoId()) &&
-                        allMatches.get(i).getUserTwoId().equals(allMatches.get(j).getUserOneId())) {
-                        indicator[i]=1;
-                        indicator[j]=1;
+        int[] indicator = new int[allMatches.size()];
+        for (int i = 0; i < allMatches.size(); i++)
+        {
+            if (indicator[i] != 1)
+            {
+                for (int j = i + 1; j < allMatches.size(); j++)
+                {
+                    if (allMatches.get(i).getUserOneId().equals(allMatches.get(j).getUserTwoId()) &&
+                            allMatches.get(i).getUserTwoId().equals(allMatches.get(j).getUserOneId()))
+                    {
+                        indicator[i] = 1;
+                        indicator[j] = 1;
                         confirmedMatches.add(allMatches.get(i));
                         break;
                     }
@@ -753,28 +841,6 @@ public class MatchService {
         }
         return confirmedMatches;
     }
-
-//    public boolean updateCourse(Course course)
-//    {
-//        Query query = new Query();
-//        query.addCriteria(Criteria.where("id").is(course.getId()));
-//        List<Course> courses = mongoTemplate.find(query, Course.class);
-//        if (courses == null || courses.size() <= 0)
-//        {
-//            return false;
-//        }
-//        if(course.getCourseName() == null){
-//            course.setCourseName(courses.get(0).getCourseName());
-//        }
-//
-////        courses.de(course.getId());
-////        studentRepository.insert(course);
-////        return true;
-//
-//
-//    }
-
-
 
 
 }

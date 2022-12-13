@@ -16,14 +16,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document
-public class Matches {
+public class Matches
+{
     @Id
     private String id;
     private String userOneId;
     private String userTwoId;
 
 
-    public void print() {
+    public void print()
+    {
         System.out.println("id : " + this.id);
         System.out.println("user1 : " + this.userOneId);
         System.out.println("user2 : " + this.userTwoId);

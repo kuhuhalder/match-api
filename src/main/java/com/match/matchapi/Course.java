@@ -1,9 +1,8 @@
 package com.match.matchapi;
 
-import org.springframework.data.annotation.Id;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 
 
 @Data
@@ -17,7 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author Farah Lubaba Rouf
  */
 
-public class Course {
+public class Course
+{
     @Id
     private String id;
     private String courseName;

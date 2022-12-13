@@ -18,7 +18,8 @@ import java.util.List;
 
 @Data
 @Document
-public class Student {
+public class Student
+{
     @Id
     private String id;
     @Indexed(unique = true)
@@ -35,13 +36,12 @@ public class Student {
     private String bio;
 
     private String contactInfo;
-
-   // private ArrayList<String> courses;
     private List<String> course;
 
     private Integer isAdmin;
 
-    public void print() {
+    public void print()
+    {
         System.out.println("id : " + this.id);
         System.out.println("userName : " + this.userName);
         System.out.println("password : " + this.password);
