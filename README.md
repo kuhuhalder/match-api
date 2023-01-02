@@ -1,6 +1,6 @@
 # match-api
 
-Back-end/ server code for MATCH
+Back-end/ server code for MATCH (https://github.com/kuhuhalder/match)
 
 ## To run the backend application on Java and Springboot:
 
@@ -16,4 +16,6 @@ git clone [https://github.com/kuhuhalder/match](https://github.com/kuhuhalder/ma
 - Type `./gradlew build` into terminal
 - Run [`MatchapiApplication.java`](http://MatchapiApplication.java) file
 
-Technology Stack: Java + Springboot
+## Technology Stack: 
+
+Java + Springboot
