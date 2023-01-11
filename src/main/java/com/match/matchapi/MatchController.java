@@ -32,6 +32,12 @@ public class MatchController
      * Gets a list of all students
      */
 
+    @GetMapping(path = "/")
+    @ResponseBody
+    public String hello() {
+        return "Hello world!";
+    }
+
     @GetMapping(path = "/getAll")
     @ResponseBody
     @CrossOrigin(origins = {"http://localhost:3000", "https://match-swensational.netlify.app"})
@@ -84,7 +90,7 @@ public class MatchController
      */
 
     @GetMapping(path = "/validate/{userName}/{password}")
-    @CrossOrigin(origins = {"http://localhost:3000", "https://match-swensational.netlify.app"})
+    @CrossOrigin(origins = {"http://localhost:3000", "https://match-swensational.netlify.app", "https://tonal-limiter-374222.ue.r.appspot.com"})
     public ResponseEntity validation(@PathVariable String userName, @PathVariable String password)
     {
         if (matchService.validation(userName, password))

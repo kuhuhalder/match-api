@@ -1,7 +1,25 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.2.0'
+	}
+}
+
+
 plugins {
 	id 'org.springframework.boot' version '2.7.4'
 	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
 	id 'java'
+}
+
+apply plugin: 'com.google.cloud.tools.appengine'
+appengine {  // App Engine tasks configuration
+	deploy {   // deploy configuration
+		projectId = 'GCLOUD_CONFIG' // gcloud config set project
+		appengine.deploy.version = 'GCLOUD_CONFIG'
+	}
 }
 
 group = 'com.match'
@@ -34,6 +52,8 @@ jar {
 	baseName = 'app'
 	version = '0.0.1'
 }
+
+
 //task stage(type: Copy, dependsOn: [clean, build]) {
 //	from jar.archivePath
 //	into project.rootDir
@@ -41,12 +61,12 @@ jar {
 //		'app.jar'
 //	}
 //}
-//stage.mustRunAfter(clean)
+////stage.mustRunAfter(clean)
+////
+////clean << {
+////	project.file('app.jar').delete()
+////}
 //
-//clean << {
-//	project.file('app.jar').delete()
-//}
-
 //jar {
 //	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 //	manifest {
