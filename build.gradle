@@ -53,12 +53,39 @@ jar {
 	version = '0.0.1'
 	manifest {
 		attributes(
-				'Main-Class': 'com.mypackage.MyClass'
+				'Main-Class': 'com.match.matchapi.MatchapiApplication'
 		)
 	}
 
 }
 
+//task fatJar(type: Jar) {
+//	manifest.from jar.manifest
+////    classifier = 'all'
+//	from {
+//		configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+//	} {
+//		exclude "META-INF/*.SF"
+//		exclude "META-INF/*.DSA"
+//		exclude "META-INF/*.RSA"
+//	}
+//	with jar
+//}
+
+//artifacts {
+//	archives fatJar
+//}
+
+//task fatJar(type: Jar) {
+//	manifest {
+//		attributes 'Implementation-Title': 'Gradle Jar File Example',
+//				'Implementation-Version': version,
+//				'Main-Class': 'com.match.matchapi.MatchapiApplication'
+//	}
+//	baseName = project.name + '-all'
+//	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//	with jar
+//}
 
 //task stage(type: Copy, dependsOn: [clean, build]) {
 //	from jar.archivePath
@@ -73,11 +100,11 @@ jar {
 ////	project.file('app.jar').delete()
 ////}
 //
-jar {
-	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
-	manifest {
-		attributes(
-				'Main-Class': 'com.match.matchapi.MatchapiApplication'
-		)
-	}
-}
+//jar {
+//	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+//	manifest {
+//		attributes(
+//				'Main-Class': 'com.match.matchapi.MatchapiApplication'
+//		)
+//	}
+//}
