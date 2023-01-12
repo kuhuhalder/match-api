@@ -51,6 +51,12 @@ tasks.named('test') {
 jar {
 	baseName = 'app'
 	version = '0.0.1'
+	manifest {
+		attributes(
+				'Main-Class': 'com.mypackage.MyClass'
+		)
+	}
+
 }
 
 
@@ -67,11 +73,11 @@ jar {
 ////	project.file('app.jar').delete()
 ////}
 //
-//jar {
-//	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
-//	manifest {
-//		attributes(
-//				'Main-Class': 'com.heroku.herokudemo.HerokuDemoApplication'
-//		)
-//	}
-//}
+jar {
+	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+	manifest {
+		attributes(
+				'Main-Class': 'com.match.matchapi.MatchapiApplication'
+		)
+	}
+}
