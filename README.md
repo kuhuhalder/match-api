@@ -19,3 +19,7 @@ git clone [https://github.com/kuhuhalder/match](https://github.com/kuhuhalder/ma
 ## Technology Stack: 
 
 Java + Springboot
+
+## Deployment
+
+The backend server is deployed on Heroku.
